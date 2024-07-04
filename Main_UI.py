@@ -534,3 +534,12 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.type_of_expense_combo_box.activated[int].connect(self.set_expense_line)
         
         self.btn_sub_expense.clicked.connect(self.take_exp)             
+        
+    def set_exp_attr(self):
+        self.exp_amount = self.amount_of_expense_line.text()
+        self.exp_day = self.day_of_expense_line.text()
+        self.exp_month = self.month_of_expense_line.text()
+        self.exp_year = self.year_of_expense_line.text()
+        self.exp_source = self.source_of_expense_line.text()
+        self.exp_desc = self.description_expense_line.text()
+        self.exp_type = self.type_of_expense_line.text()     
