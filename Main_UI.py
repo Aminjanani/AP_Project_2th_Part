@@ -713,3 +713,179 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.leftLayout.addWidget(self.search_view)
         self.search_view.setStyleSheet(self.view_style)
         #self.btn_searching.clicked.connect(self.search_logic)          
+        
+    def report(self):
+        if self.current_layout == 'report':
+            return
+        self.current_layout = 'report'
+        self.clear_layout(self.leftLayout)
+        self.clear_layout(self.hlayout)
+        self.clear_layout(self.hlayout2)
+        self.clear_layout(self.hlayout3)
+        self.clear_layout(self.hlayout4)
+        self.clear_layout(self.hlayout5)
+        self.clear_layout(self.hlayout6)
+        self.clear_layout(self.hlayout7)
+
+        self.year_of_report_combo_box = Validation.QComboBox()
+        self.year_of_report_combo_box.setStyleSheet(self.combo_main_style)
+        self.month_of_report_combo_box = Validation.QComboBox()
+        self.month_of_report_combo_box.setStyleSheet(self.combo_main_style)
+        self.day_of_report_combo_box = Validation.QComboBox()
+        self.day_of_report_combo_box.setStyleSheet(self.combo_main_style)
+
+        self.year_of_report_combo_box2 = Validation.QComboBox()
+        self.year_of_report_combo_box2.setStyleSheet(self.combo_main_style)
+        self.month_of_report_combo_box2 = Validation.QComboBox()
+        self.month_of_report_combo_box2.setStyleSheet(self.combo_main_style)
+        self.day_of_report_combo_box2 = Validation.QComboBox()
+        self.day_of_report_combo_box2.setStyleSheet(self.combo_main_style)
+
+        for i in range(1, 32):
+            self.day_of_report_combo_box.addItem(f"{i}")
+
+        for month in self.months.keys():
+            self.month_of_report_combo_box.addItem(month)
+
+        for i in range(1930, 2051):
+            self.year_of_report_combo_box.addItem(f"{i}")
+
+        for i in range(1, 32):
+            self.day_of_report_combo_box2.addItem(f"{i}")
+
+        for month in self.months.keys():
+            self.month_of_report_combo_box2.addItem(month)
+
+        for i in range(1930, 2051):
+            self.year_of_report_combo_box2.addItem(f"{i}")
+
+        self.year_of_report_combo_box.activated[int].connect(self.set_year_report_line)
+        self.month_of_report_combo_box.activated[int].connect(self.set_month_report_line)
+        self.day_of_report_combo_box.activated[int].connect(self.set_day_report_line)
+
+        self.year_of_report_combo_box2.activated[int].connect(self.set_year_report_line2)
+        self.month_of_report_combo_box2.activated[int].connect(self.set_month_report_line2)
+        self.day_of_report_combo_box2.activated[int].connect(self.set_day_report_line2)
+
+        self.from_report_line = Validation.QLineEdit()
+        self.from_report_line.setText("From")
+        self.from_report_line.setStyleSheet("""
+        QLineEdit {
+           background-color: #AD4379; 
+           color: #0A0A0A;               
+           border: 3px solid #34568B;    
+           border-radius: 10px;        
+           padding: 4px;
+        }
+        QLineEdit:hover {
+            background-color: #0081AB; 
+        }
+        """)
+        self.from_report_line.setReadOnly(True)
+        self.day_of_report_line = Validation.QLineEdit()
+        self.day_of_report_line.setPlaceholderText("Day")
+        self.day_of_report_line.setStyleSheet(self.line_main_style)
+        self.month_of_report_line = Validation.QLineEdit()
+        self.month_of_report_line.setPlaceholderText("Month")
+        self.month_of_report_line.setStyleSheet(self.line_main_style)
+        self.year_of_report_line = Validation.QLineEdit()
+        self.year_of_report_line.setPlaceholderText("Year")
+        self.year_of_report_line.setStyleSheet(self.line_main_style)
+
+        self.until_report_line = Validation.QLineEdit()
+        self.until_report_line.setText("Until")
+        self.until_report_line.setStyleSheet("""
+        QLineEdit {
+           background-color: #AD4379; 
+           color: #0A0A0A;               
+           border: 3px solid #34568B;    
+           border-radius: 10px;        
+           padding: 4px;
+        }
+        QLineEdit:hover {
+            background-color: #0081AB; 
+        }
+        """)
+        self.until_report_line.setReadOnly(True)
+        self.day_of_report_line2 = Validation.QLineEdit()
+        self.day_of_report_line2.setPlaceholderText("Day")
+        self.day_of_report_line2.setStyleSheet(self.line_main_style)
+        self.month_of_report_line2 = Validation.QLineEdit()
+        self.month_of_report_line2.setPlaceholderText("Month")
+        self.month_of_report_line2.setStyleSheet(self.line_main_style)
+        self.year_of_report_line2 = Validation.QLineEdit()
+        self.year_of_report_line2.setPlaceholderText("Year")
+        self.year_of_report_line2.setStyleSheet(self.line_main_style)
+
+        self.day_report_check = Validation.QCheckBox("day_report")
+        self.day_report_check.setStyleSheet(self.check_box_style)
+        self.month_report_check = Validation.QCheckBox("month_report")
+        self.month_report_check.setStyleSheet(self.check_box_style)
+        self.year_report_check = Validation.QCheckBox("year_report")
+        self.year_report_check.setStyleSheet(self.check_box_style)
+        self.report_0_100_dollar_check = Validation.QCheckBox("0 - 100 $")
+        self.report_0_100_dollar_check.setStyleSheet(self.check_box_style)
+        self.report_100_1000_dollar_check = Validation.QCheckBox("100 - 1000 $")
+        self.report_100_1000_dollar_check.setStyleSheet(self.check_box_style)
+        self.report_more_than_1000_dollar_check = Validation.QCheckBox("More Than 1000 $")
+        self.report_more_than_1000_dollar_check.setStyleSheet(self.check_box_style)
+        self.cash_check = Validation.QCheckBox("Cash")
+        self.cash_check.setStyleSheet(self.check_box_style)
+        self.cheque_check = Validation.QCheckBox("Cheque")
+        self.cheque_check.setStyleSheet(self.check_box_style)
+        self.digital_check = Validation.QCheckBox("digital_currency")
+        self.digital_check.setStyleSheet(self.check_box_style)
+        self.saving_check = Validation.QCheckBox("Saving")
+        self.saving_check.setStyleSheet(self.check_box_style)
+        self.wage_check = Validation.QCheckBox("wage")
+        self.wage_check.setStyleSheet(self.check_box_style)
+        self.report_revenue_check = Validation.QCheckBox("Revenue")
+        self.report_revenue_check.setStyleSheet(self.check_box_style)
+        self.report_expense_check = Validation.QCheckBox("Expense")
+        self.report_expense_check.setStyleSheet(self.check_box_style)
+        self.btn_report = Validation.QPushButton("Report")
+        self.btn_report.setStyleSheet(self.btn_main_style)
+    
+        self.leftLayout.addWidget(self.from_report_line)
+
+        self.leftLayout.addLayout(self.hlayout4)
+        
+        self.hlayout4.addWidget(self.day_of_report_line)
+        self.hlayout4.addWidget(self.month_of_report_line)
+        self.hlayout4.addWidget(self.year_of_report_line)
+        self.leftLayout.addLayout(self.hlayout)
+        self.hlayout.addWidget(self.day_of_report_combo_box)
+        self.hlayout.addWidget(self.month_of_report_combo_box)
+        self.hlayout.addWidget(self.year_of_report_combo_box)
+
+        self.leftLayout.addWidget(self.until_report_line)
+        self.leftLayout.addLayout(self.hlayout5)
+        self.hlayout5.addWidget(self.day_of_report_line2)
+        self.hlayout5.addWidget(self.month_of_report_line2)
+        self.hlayout5.addWidget(self.year_of_report_line2)
+        self.leftLayout.addLayout(self.hlayout6)
+        self.hlayout6.addWidget(self.day_of_report_combo_box2)
+        self.hlayout6.addWidget(self.month_of_report_combo_box2)
+        self.hlayout6.addWidget(self.year_of_report_combo_box2)
+
+        self.leftLayout.addLayout(self.hlayout2)
+        self.hlayout2.addWidget(self.day_report_check)
+        self.hlayout2.addWidget(self.month_report_check)
+        self.hlayout2.addWidget(self.year_report_check)
+        self.hlayout2.addWidget(self.report_0_100_dollar_check)
+        self.hlayout2.addWidget(self.report_100_1000_dollar_check)
+        self.hlayout2.addWidget(self.report_more_than_1000_dollar_check)
+        self.leftLayout.addLayout(self.hlayout3)
+        self.hlayout3.addWidget(self.cash_check)
+        self.hlayout3.addWidget(self.cheque_check)
+        self.hlayout3.addWidget(self.digital_check)
+        self.hlayout3.addWidget(self.wage_check)
+        self.hlayout3.addWidget(self.saving_check)
+        self.hlayout3.addWidget(self.report_revenue_check)
+        self.hlayout3.addWidget(self.report_expense_check)
+        self.leftLayout.addWidget(self.btn_report)
+        self.report_view = Validation.QTextBrowser()
+        self.leftLayout.addWidget(self.report_view)
+        self.report_view.setStyleSheet(self.view_style)
+        
+        #self.btn_report.clicked.connect(self.report_logic)    
