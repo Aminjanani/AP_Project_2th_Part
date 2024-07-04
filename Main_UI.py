@@ -14,9 +14,6 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
     
     def __init__(self):
         super().__init__()   
-        self.revenue_file = ""
-        self.expense_file = ""
-        self.category_file = ""
         self.rev_amount = ""
         self.rev_day = ""
         self.rev_month = ""
@@ -32,11 +29,11 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.exp_desc = ""
         self.exp_type = ""
         self.searched_word = ""
+        self.revenue_file = self.user_name + f"_revenue.db"
+        self.expense_file = self.user_name + f"_expense.db"
+        self.category_file = self.user_name + f"_category.db"
 
     def Main_window(self):
-        self.revenue_file = self.user_name + f"_revenue.xlsx"
-        self.expense_file = self.user_name + f"_expense.xlsx"
-        self.category_file = self.user_name + f"_category.xlsx" 
         
         self.setGeometry(400, 100, 600, 300)
         self.mainWidget = Validation.QWidget(self)
@@ -632,4 +629,87 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
             if self.type_of_expense_label.isVisible() :
                     self.type_of_expense_label.setVisible(False)                           
             self.set_exp_attr()
-            #self.create_user_expense_file()    
+            #self.create_user_expense_file()  
+            
+    def search(self):
+        if self.current_layout == 'search':
+            return
+        self.current_layout = 'search'
+        self.clear_layout(self.leftLayout)
+        self.clear_layout(self.hlayout)
+        self.clear_layout(self.hlayout2)
+        self.clear_layout(self.hlayout3)
+        self.clear_layout(self.hlayout4)
+        self.clear_layout(self.hlayout5)
+        self.clear_layout(self.hlayout6)
+        self.clear_layout(self.hlayout7)
+
+        self.leftLayout.addLayout(self.hlayout)
+        self.search_line = Validation.QLineEdit()
+        self.search_line.setStyleSheet(self.line_main_style)
+        self.search_line.setPlaceholderText("Search")
+        self.btn_searching = Validation.QPushButton("Searching")
+        self.btn_searching.setStyleSheet(self.btn_main_style)
+        self.day_revenue_check = Validation.QCheckBox("day_revenue")
+        self.day_revenue_check.setStyleSheet(self.check_box_style)
+        self.day_expense_check = Validation.QCheckBox("day_expense")
+        self.day_expense_check.setStyleSheet(self.check_box_style)
+        self.month_revenue_check = Validation.QCheckBox("month_revenue")
+        self.month_revenue_check.setStyleSheet(self.check_box_style)
+        self.month_expense_check = Validation.QCheckBox("month_expense")
+        self.month_expense_check.setStyleSheet(self.check_box_style)
+        self.year_revenue_check = Validation.QCheckBox("year_revenue")
+        self.year_revenue_check.setStyleSheet(self.check_box_style)
+        self.year_expense_check = Validation.QCheckBox("year_expense")
+        self.year_expense_check.setStyleSheet(self.check_box_style)
+        self.value_0_100_dollar_check = Validation.QCheckBox("0 - 100 $")
+        self.value_0_100_dollar_check.setStyleSheet(self.check_box_style)
+        self.value_100_1000_dollar_check = Validation.QCheckBox("100 - 1000 $")
+        self.value_100_1000_dollar_check.setStyleSheet(self.check_box_style)
+        self.value_more_than_1000_dollar_check = Validation.QCheckBox("More Than 1000 $")
+        self.value_more_than_1000_dollar_check.setStyleSheet(self.check_box_style)
+        self.wage_check = Validation.QCheckBox("Wage")
+        self.wage_check.setStyleSheet(self.check_box_style)
+        self.type_revenue_check = Validation.QCheckBox("Type Revenue")
+        self.type_revenue_check.setStyleSheet(self.check_box_style)
+        self.type_expense_check = Validation.QCheckBox("Type Expensee")
+        self.type_expense_check.setStyleSheet(self.check_box_style)
+        self.source_revenue_check = Validation.QCheckBox("Source Revenue")
+        self.source_revenue_check.setStyleSheet(self.check_box_style)
+        self.source_expense_check = Validation.QCheckBox("Source Expense")
+        self.source_expense_check.setStyleSheet(self.check_box_style)
+        self.revenue_desc_check = Validation.QCheckBox("revenue_description")
+        self.revenue_desc_check.setStyleSheet(self.check_box_style)
+        self.expense_desc_check = Validation.QCheckBox("expense_description")
+        self.expense_desc_check.setStyleSheet(self.check_box_style)
+        self.revenue_check = Validation.QCheckBox("revenue")
+        self.revenue_check.setStyleSheet(self.check_box_style)
+        self.expense_check = Validation.QCheckBox("expense")
+        self.expense_check.setStyleSheet(self.check_box_style)
+        
+        self.hlayout.addWidget(self.search_line)
+        self.hlayout.addWidget(self.btn_searching)
+        self.leftLayout.addLayout(self.hlayout2)
+        self.hlayout2.addWidget(self.day_revenue_check)
+        self.hlayout2.addWidget(self.month_revenue_check)
+        self.hlayout2.addWidget(self.year_revenue_check)
+        self.hlayout2.addWidget(self.value_0_100_dollar_check)
+        self.hlayout2.addWidget(self.value_100_1000_dollar_check)
+        self.hlayout2.addWidget(self.value_more_than_1000_dollar_check)
+        self.leftLayout.addLayout(self.hlayout3)
+        self.hlayout3.addWidget(self.day_expense_check)
+        self.hlayout3.addWidget(self.month_expense_check)
+        self.hlayout3.addWidget(self.year_expense_check)
+        self.hlayout3.addWidget(self.type_expense_check)
+        self.hlayout3.addWidget(self.source_expense_check)
+        self.leftLayout.addLayout(self.hlayout4)
+        self.hlayout4.addWidget(self.type_revenue_check)
+        self.hlayout4.addWidget(self.source_revenue_check)
+        self.hlayout4.addWidget(self.revenue_check)
+        self.hlayout4.addWidget(self.revenue_desc_check)
+        self.hlayout4.addWidget(self.expense_check )
+        self.hlayout4.addWidget(self.expense_desc_check)
+        self.search_view = Validation.QTextBrowser()
+        self.leftLayout.addWidget(self.search_view)
+        self.search_view.setStyleSheet(self.view_style)
+        #self.btn_searching.clicked.connect(self.search_logic)          
