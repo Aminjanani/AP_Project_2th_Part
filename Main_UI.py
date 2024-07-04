@@ -313,11 +313,101 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         
         #self.btn_sub_revenue.clicked.connect(self.take_rev)
         
-    def set_rev_attr(self) :
+    def set_rev_attr(self):
         self.rev_amount = self.amount_of_revenue_line.text()
         self.rev_day = self.day_of_revenue_line.text()
         self.rev_month = self.month_of_revenue_line.text()
         self.rev_year = self.year_of_revenue_line.text()
         self.rev_source = self.source_of_revenue_line.text()
         self.rev_desc = self.description_revenue_line.text()
-        self.rev_type = self.type_of_revenue_line.text()     
+        self.rev_type = self.type_of_revenue_line.text()  
+        
+    def take_rev(self):
+        rev_amount = self.amount_of_revenue_line.text()
+        rev_day = self.day_of_revenue_line.text()
+        rev_month = self.month_of_revenue_line.text()
+        rev_year = self.year_of_revenue_line.text()
+        rev_source = self.source_of_revenue_line.text()
+        rev_desc = self.description_revenue_line.text()
+        rev_type = self.type_of_revenue_line.text()
+         
+        rev_amount_val = self.digit_val(rev_amount)
+        rev_day_val = self.day_val(rev_day, rev_month)
+        rev_month_val = self.mounth_val(rev_month)
+        rev_year_val = self.revexp_year_val(rev_year)
+        if rev_source != "":
+            rev_source_val = True
+        else:
+            rev_source_val = False
+        if len(rev_desc) <= 100 :        
+            rev_desc_val = True
+        else :
+            rev_desc_val = False 
+        if rev_type != "":    
+            rev_type_val = True
+        else :
+             rev_type_val = False   
+         
+        rev_val_list = [rev_amount_val, rev_day_val, rev_month_val, 
+                        rev_year_val, rev_source_val, rev_desc_val, rev_type_val]
+         
+        if False in rev_val_list:
+            if not rev_val_list[0]:
+                if not self.amount_of_revenue_label.isVisible():
+                    self.amount_of_revenue_label.setVisible(True)
+            else:
+                if self.amount_of_revenue_label.isVisible():
+                    self.amount_of_revenue_label.setVisible(False)       
+            if not rev_val_list[1]:
+                if not self.day_of_revenue_label.isVisible():
+                    self.day_of_revenue_label.setVisible(True)
+            else:
+                if self.day_of_revenue_label.isVisible():
+                    self.day_of_revenue_label.setVisible(False) 
+            if not rev_val_list[2]:
+                if not self.month_of_revenue_label.isVisible():
+                    self.month_of_revenue_label.setVisible(True)
+            else:
+                if self.month_of_revenue_label.isVisible():
+                    self.month_of_revenue_label.setVisible(False) 
+            if not rev_val_list[3]:
+                if not self.year_of_revenue_label.isVisible():
+                    self.year_of_revenue_label.setVisible(True)
+            else:
+                if self.year_of_revenue_label.isVisible():
+                    self.year_of_revenue_label.setVisible(False) 
+            if not rev_val_list[4]:
+                if not self.source_of_revenue_label.isVisible():
+                    self.source_of_revenue_label.setVisible(True)
+            else:
+                if self.source_of_revenue_label.isVisible():
+                    self.source_of_revenue_label.setVisible(False) 
+            if not rev_val_list[5]:
+                if not self.desc_of_revenue_label.isVisible():
+                    self.desc_of_revenue_label.setVisible(True)
+            else:
+                if self.desc_of_revenue_label.isVisible():
+                    self.desc_of_revenue_label.setVisible(False) 
+            if not rev_val_list[6]:
+                if not self.type_of_revenue_label.isVisible():
+                    self.type_of_revenue_label.setVisible(True)
+            else:
+                if self.type_of_revenue_label.isVisible():
+                    self.type_of_revenue_label.setVisible(False)        
+        else:
+            if self.amount_of_revenue_label.isVisible():
+                    self.amount_of_revenue_label.setVisible(False)
+            if self.day_of_revenue_label.isVisible():
+                    self.day_of_revenue_label.setVisible(False) 
+            if self.month_of_revenue_label.isVisible():
+                    self.month_of_revenue_label.setVisible(False)                 
+            if self.year_of_revenue_label.isVisible():
+                    self.year_of_revenue_label.setVisible(False)   
+            if self.source_of_revenue_label.isVisible():
+                    self.source_of_revenue_label.setVisible(False) 
+            if self.desc_of_revenue_label.isVisible():
+                    self.desc_of_revenue_label.setVisible(False)   
+            if self.type_of_revenue_label.isVisible():
+                    self.type_of_revenue_label.setVisible(False)
+            self.set_rev_attr()
+            #self.create_user_revenue_file()       
