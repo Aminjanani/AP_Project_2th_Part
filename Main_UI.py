@@ -543,3 +543,93 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.exp_source = self.source_of_expense_line.text()
         self.exp_desc = self.description_expense_line.text()
         self.exp_type = self.type_of_expense_line.text()     
+        
+    def take_exp(self):
+        exp_amount = self.amount_of_expense_line.text()
+        exp_day = self.day_of_expense_line.text()
+        exp_month = self.month_of_expense_line.text()
+        exp_year = self.year_of_expense_line.text()
+        exp_source = self.source_of_expense_line.text()
+        exp_desc = self.description_expense_line.text()
+        exp_type = self.type_of_expense_line.text()
+         
+        exp_amount_val = self.digit_val(exp_amount)
+        exp_day_val = self.day_val(exp_day, exp_month)
+        exp_month_val = self.mounth_val(exp_month)
+        exp_year_val = self.revexp_year_val(exp_year)
+        if exp_source != "" :
+            exp_source_val = True
+        else :
+            exp_source_val = False
+        if len(exp_desc) <= 100 :        
+            exp_desc_val = True
+        else :
+            exp_desc_val = False 
+        if exp_type != "" :    
+            exp_type_val = True
+        else :
+             exp_type_val = False
+         
+        exp_val_list = [exp_amount_val, exp_day_val, exp_month_val, 
+                        exp_year_val, exp_source_val, exp_desc_val, exp_type_val]
+         
+        if False in exp_val_list :
+            if not exp_val_list[0] :
+                if not self.amount_of_expense_label.isVisible() :
+                    self.amount_of_expense_label.setVisible(True)
+            else :
+                if self.amount_of_expense_label.isVisible() :
+                    self.amount_of_expense_label.setVisible(False)       
+            if not exp_val_list[1] :
+                if not self.day_of_expense_label.isVisible() :
+                    self.day_of_expense_label.setVisible(True)
+            else :
+                if self.day_of_expense_label.isVisible() :
+                    self.day_of_expense_label.setVisible(False) 
+            if not exp_val_list[2] :
+                if not self.month_of_expense_label.isVisible() :
+                    self.month_of_expense_label.setVisible(True)
+            else :
+                if self.month_of_expense_label.isVisible() :
+                    self.month_of_expense_label.setVisible(False) 
+            if not exp_val_list[3] :
+                if not self.year_of_expense_label.isVisible() :
+                    self.year_of_expense_label.setVisible(True)
+            else :
+                if self.year_of_expense_label.isVisible() :
+                    self.year_of_expense_label.setVisible(False) 
+            if not exp_val_list[4] :
+                if not self.source_of_expense_label.isVisible() :
+                    self.source_of_expense_label.setVisible(True)
+            else :
+                if self.source_of_expense_label.isVisible() :
+                    self.source_of_expense_label.setVisible(False) 
+            if not exp_val_list[5] :
+                if not self.desc_of_expense_label.isVisible() :
+                    self.desc_of_expense_label.setVisible(True)
+            else :
+                if self.desc_of_expense_label.isVisible() :
+                    self.desc_of_expense_label.setVisible(False) 
+            if not exp_val_list[6] :
+                if not self.type_of_expense_label.isVisible() :
+                    self.type_of_expense_label.setVisible(True)
+            else :
+                if self.type_of_expense_label.isVisible() :
+                    self.type_of_expense_label.setVisible(False) 
+        else :
+            if self.amount_of_expense_label.isVisible() :
+                    self.amount_of_expense_label.setVisible(False)
+            if self.day_of_expense_label.isVisible() :
+                    self.day_of_expense_label.setVisible(False) 
+            if self.month_of_expense_label.isVisible() :
+                    self.month_of_expense_label.setVisible(False)                 
+            if self.year_of_expense_label.isVisible() :
+                    self.year_of_expense_label.setVisible(False)   
+            if self.source_of_expense_label.isVisible() :
+                    self.source_of_expense_label.setVisible(False) 
+            if self.desc_of_expense_label.isVisible() :
+                    self.desc_of_expense_label.setVisible(False)   
+            if self.type_of_expense_label.isVisible() :
+                    self.type_of_expense_label.setVisible(False)                           
+            self.set_exp_attr()
+            #self.create_user_expense_file()    
