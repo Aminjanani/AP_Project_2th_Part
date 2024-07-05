@@ -1129,7 +1129,23 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
             item = layout.takeAt(0)
             widget = item.widget()
             if widget is not None:
-                widget.deleteLater()  
+                widget.deleteLater() 
+                
+    def set_month_edit_line(self, index):
+        month = self.month_of_edit_combo_box.itemText(index)
+        self.mounth_line_edit2.setText(month)
+
+    def set_day_edit_line(self, index):
+        day = self.day_of_edit_combo_box.itemText(index)
+        self.day_line_edit2.setText(day)
+
+    def set_year_report_line2(self, index):
+        year = self.year_of_report_combo_box2.itemText(index)
+        self.year_of_report_line2.setText(year)
+
+    def set_month_report_line2(self, index):
+        month = self.month_of_report_combo_box2.itemText(index)
+        self.month_of_report_line2.setText(month)             
                 
     def set_day_report_line2(self, index):
         day = self.day_of_report_combo_box2.itemText(index)
@@ -1142,4 +1158,6 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
     def update_combo_box_expense(self):
         text = self.type_of_expense_line.text()
         if text and self.type_of_expense_combo_box.findText(text) == -1:
-            self.type_of_expense_combo_box.addItems(text)                                          
+            self.type_of_expense_combo_box.addItems(text) 
+            
+                                                     
