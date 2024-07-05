@@ -1131,6 +1131,22 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
             if widget is not None:
                 widget.deleteLater() 
                 
+    def set_year_revenue_line(self, index):
+        year = self.year_of_revenue_combo_box.itemText(index)
+        self.year_of_revenue_line.setText(year)
+
+    def set_month_revenue_line(self, index):
+        month = self.month_of_revenue_combo_box.itemText(index)
+        self.month_of_revenue_line.setText(month)
+
+    def set_day_revenue_line(self, index):
+        day = self.day_of_revenue_combo_box.itemText(index)
+        self.day_of_revenue_line.setText(day)
+
+    def set_source_line(self, index):
+        day = self.source_of_revenue_combo_box.itemText(index)
+        self.source_of_revenue_line.setText(day)            
+                
     def set_revenue_line(self, index):
         revenue_type = self.type_of_revenue_combo_box.itemText(index)
         self.type_of_revenue_line.setText(revenue_type)
