@@ -1131,6 +1131,26 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
             if widget is not None:
                 widget.deleteLater() 
                 
+    def set_year_report_line(self, index):
+        year = self.year_of_report_combo_box.itemText(index)
+        self.year_of_report_line.setText(year)
+
+    def set_month_report_line(self, index):
+        month = self.month_of_report_combo_box.itemText(index)
+        self.month_of_report_line.setText(month)
+
+    def set_day_report_line(self, index):
+        day = self.day_of_report_combo_box.itemText(index)
+        self.day_of_report_line.setText(day)
+
+    def set_delete_line(self, index):
+        day = self.delete_info_combo.itemText(index)
+        self.delete_info_line.setText(day)
+
+    def set_year_edit_line(self, index):
+        year = self.year_of_edit_combo_box.itemText(index)
+        self.year_line_edit2.setText(year)            
+                
     def set_month_edit_line(self, index):
         month = self.month_of_edit_combo_box.itemText(index)
         self.mounth_line_edit2.setText(month)
