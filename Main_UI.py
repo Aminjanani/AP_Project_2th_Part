@@ -14,7 +14,9 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
     delete_information =["user", "transaction", "just revenue", "just expense"]
     
     def __init__(self):
-        super().__init__()   
+        super().__init__()  
+        user.__init__(self)
+        Validation.check_validation.__init__(self)
         self.rev_amount = ""
         self.rev_day = ""
         self.rev_month = ""
@@ -234,7 +236,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.source_of_revenue_combo_box = Validation.QComboBox()
         self.source_of_revenue_combo_box.setStyleSheet(self.combo_main_style)
 
-        self.add_item_category_combo()
+        #self.add_item_category_combo()
 
         self.description_revenue_line = Validation.QLineEdit()
         self.description_revenue_line.setPlaceholderText("Description Of Revenue")
@@ -448,7 +450,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.year_of_expense_line = Validation.QLineEdit()
         self.year_of_expense_line.setPlaceholderText("Year")
         self.year_of_expense_line.setStyleSheet(self.line_main_style)
-        self.year_of_expense_label = QLabel()
+        self.year_of_expense_label = Validation.QLabel()
         self.year_of_expense_label.setVisible(False)
         self.year_of_expense_label.setText("please enter a valid year!")
         self.year_of_expense_label.setStyleSheet('color: red')
@@ -1229,4 +1231,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         if text and self.type_of_expense_combo_box.findText(text) == -1:
             self.type_of_expense_combo_box.addItems(text) 
             
-                                                     
+if __name__ == '__main__' :
+    app = Validation.QApplication(Validation.sys.argv)
+    ex = MainUI()    
+    Validation.sys.exit(app.exec())                                                    
