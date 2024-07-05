@@ -1124,6 +1124,18 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
             if not self.close_rev_file_label.isVisible():
                 self.close_rev_file_label.setVisible(True) 
                 
+    def exit(self):
+        self.close()
+
+    def dark_lite_mode(self, text):
+        if text == "Dark":
+        
+            self.leftWidget.setStyleSheet("background-color: #BBB477;")
+            self.rightWidget.setStyleSheet("background-color: #2E5894;")
+        else  :
+            self.leftWidget.setStyleSheet("background-color: #FBE870;")
+            self.rightWidget.setStyleSheet("background-color: #52afb6;")            
+                
     def clear_layout(self, layout):
         while layout.count():
             item = layout.takeAt(0)
