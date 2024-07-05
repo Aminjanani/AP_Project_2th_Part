@@ -1,5 +1,6 @@
 from User import user
 import Validation
+import sqlite3 as sql
 
 # This class contains the main menu of the app, including the revenue, expence, category, search, report and setting pages as well as exit button.
 class MainUI(Validation.QMainWindow, user, Validation.check_validation):
@@ -32,6 +33,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.revenue_file = self.user_name + f"_revenue.db"
         self.expense_file = self.user_name + f"_expense.db"
         self.category_file = self.user_name + f"_category.db"
+        self.Main_window()
 
     def Main_window(self):
         
@@ -129,7 +131,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.timer_label = Validation.QLabel("Elapsed Time: 00:00:00", self)
         self.timer_label.setStyleSheet("background-color:#FBE870 ;  color : #ED0A3F ")
         self.timer_label.setFixedSize(200, 40)
-        self.timer_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.timer_label.setAlignment(Validation.Qt.AlignmentFlag.AlignCenter)
         self.start_time = Validation.QTime.currentTime()
         self.timer = Validation.QTimer(self)
         self.timer.timeout.connect(self.update_timer)
@@ -163,10 +165,10 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.btn_revenue.clicked.connect(self.revenue)
         self.btn_expense.clicked.connect(self.expense)
         self.btn_category.clicked.connect(self.category)
-        self.btn_search.clicked.connect(self.search)
-        self.btn_report.clicked.connect(self.report)
-        self.btn_settings.clicked.connect(self.settings)
-        self.btn_exit.clicked.connect(self.exit)
+        #self.btn_search.clicked.connect(self.search)
+        #self.btn_report.clicked.connect(self.report)
+        #self.btn_settings.clicked.connect(self.settings)
+        #self.btn_exit.clicked.connect(self.exit)
 
         self.setCentralWidget(self.mainWidget)
         self.show()
@@ -407,7 +409,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
             if self.type_of_revenue_label.isVisible():
                     self.type_of_revenue_label.setVisible(False)
             self.set_rev_attr()
-            #self.create_user_revenue_file()  
+            self.create_user_revenue_databse()  
             
     def expense(self):
         if self.current_layout == 'expense':
@@ -630,6 +632,42 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
                     self.type_of_expense_label.setVisible(False)                           
             self.set_exp_attr()
             #self.create_user_expense_file()  
+            
+    def category(self):
+        if self.current_layout == 'category':
+            return
+        self.current_layout = 'category'
+        self.clear_layout(self.leftLayout)
+        self.clear_layout(self.hlayout)
+        self.clear_layout(self.hlayout2)
+        self.clear_layout(self.hlayout3)
+        self.clear_layout(self.hlayout4)
+        self.clear_layout(self.hlayout5)
+        self.clear_layout(self.hlayout6)
+        self.clear_layout(self.hlayout7)
+
+        self.add_category_line = Validation.QLineEdit()
+        self.add_category_line.setPlaceholderText("Category")
+        self.add_category_line.setStyleSheet(self.line_main_style)
+        self.add_btn = Validation.QPushButton("Add")
+        self.add_btn.setStyleSheet(self.btn_main_style)
+        self.category_label = Validation.QLabel("The category added before")
+        self.category_label.setStyleSheet("color : red")
+        self.category_label_err = Validation.QLabel("please close the file and try again")
+        self.category_label_err.setStyleSheet("color : red")
+        #self.category_label_err.setVisible(True)
+
+
+        self.leftLayout.addLayout(self.hlayout)
+        self.hlayout.addWidget(self.add_category_line)
+        self.hlayout.addWidget(self.add_btn)
+        self.leftLayout.addWidget(self.category_label)
+        self.leftLayout.addWidget(self.category_label_err)
+        self.category_label.hide()
+        self.category_label_err.hide()
+
+        #self.add_btn.clicked.connect(self.add_text_to_excel)
+        #self.df = pd.DataFrame(columns = ['Category'])        
             
     def search(self):
         if self.current_layout == 'search':
@@ -1062,3 +1100,46 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         
         #self.change_info_btn.clicked.connect(self.change_information)
         #self.delete_user.clicked.connect(self.Delete_User)
+        
+    def create_user_revenue_databse(self): 
+        conn =  sql.connect(self.revenue_file)   
+        cursor = conn.cursor()
+        
+        create_query = '''CREATE TABLE IF NOT EXISTS REVENUE (amount INT NOT NULL, source TEXT NOT NULL,
+                          description TEXT, type TEXT , year INT, month TEXT, day INT)
+                          VALUE (?, ?, ?, ?, ?, ?, ?)'''
+        
+        try:       
+            rev_info = [self.rev_amount, self.rev_source, self.rev_desc, 
+                        self.rev_type, self.rev_year, self.rev_month, self.rev_day] 
+            cursor.execute(create_query, rev_info)
+            conn.commit()
+        except:
+            if not self.close_rev_file_label.isVisible():
+                self.close_rev_file_label.setVisible(True)     
+        try :
+            if self.close_rev_file_label.isVisible():
+                self.close_rev_file_label.setVisible(False)
+        except:
+            if not self.close_rev_file_label.isVisible():
+                self.close_rev_file_label.setVisible(True) 
+                
+    def clear_layout(self, layout):
+        while layout.count():
+            item = layout.takeAt(0)
+            widget = item.widget()
+            if widget is not None:
+                widget.deleteLater()  
+                
+    def set_day_report_line2(self, index):
+        day = self.day_of_report_combo_box2.itemText(index)
+        self.day_of_report_line2.setText(day)
+
+    def set_expense_line(self, index):
+        expense_type = self.type_of_expense_combo_box.itemText(index)
+        self.type_of_expense_line.setText(expense_type)
+
+    def update_combo_box_expense(self):
+        text = self.type_of_expense_line.text()
+        if text and self.type_of_expense_combo_box.findText(text) == -1:
+            self.type_of_expense_combo_box.addItems(text)                                          
