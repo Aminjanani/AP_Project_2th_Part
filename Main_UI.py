@@ -755,7 +755,145 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.search_view = Validation.QTextBrowser()
         self.leftLayout.addWidget(self.search_view)
         self.search_view.setStyleSheet(self.view_style)
-        #self.btn_searching.clicked.connect(self.search_logic)          
+        #self.btn_searching.clicked.connect(self.search_logic)
+        
+    def find_month(self, month):
+        itr = 1
+        for key, value in self.months:
+            if month.lower() == key.lower():
+                return itr
+            else:
+                itr += 1
+        return None        
+        
+    def search_logic(self):
+        self.searched_word = self.search_line.text()
+        if self.searched_word != "" or self.searched_word == "":
+            rev_flag = False
+            if self.revenue_check.isChecked():
+                rev_flag = True
+            exp_flag = False
+            if self.expense_check.isChecked():
+                exp_flag = True   
+            rev_desc = False
+            if self.revenue_desc_check.isChecked():
+                rev_desc = True
+            exp_desc = False
+            if self.expense_desc_check.isChecked():
+                exp_desc = True         
+            rev_day_flag = False
+            if self.day_revenue_check.isChecked():
+                rev_day_flag = True
+            exp_day_flag = False
+            if self.day_expense_check.isChecked():
+                exp_day_flag = True
+            rev_month_flag = False
+            if self.month_revenue_check.isChecked():
+                rev_month_flag = True
+            exp_month_flag = False
+            if self.month_expense_check.isChecked():
+                exp_month_flag = True
+            rev_year_flag = False
+            if self.year_revenue_check.isChecked():
+                rev_year_flag = True
+            exp_year_flag = False
+            if self.year_expense_check.isChecked():
+                exp_year_flag = True
+            rev_type_flag = False
+            if self.type_revenue_check.isChecked():
+                rev_type_flag = True 
+            exp_type_flag = False
+            if self.type_expense_check.isChecked():
+                exp_type_flag = True 
+            rev_source_flag = False
+            if self.source_revenue_check.isChecked():
+                rev_source_flag = True 
+            exp_source_flag = False
+            if self.source_expense_check.isChecked():
+                exp_source_flag = True              
+            zero_hund_flag = False
+            if self.value_0_100_dollar_check.isChecked():
+                zero_hund_flag = True
+            hund_touse_flag = False
+            if self.value_100_1000_dollar_check.isChecked():
+                hund_touse_flag = True
+            more_flag = False 
+            if self.value_more_than_1000_dollar_check.isChecked():
+                more_flag = True
+            
+            #pattern = f"{self.searched_word}" 
+            now = Validation.datetime.now()
+            final_resault = ""    
+            if rev_flag:
+                try:    
+                    conn1 = sql.connect(self.revenue_file)
+                    cursor1 = conn1.cursor()
+                    query = '''SELECT SUM(amount) FROM REVENUE WHERE 1 = 1'''
+                    if rev_desc :
+                        query += " AND description LIKE '%{self.searched_word}%'"
+                    if rev_type_flag :
+                        query += " AND type LIKE '%{self.searched_word}%'"
+                    if rev_source_flag :
+                        query += " AND type LIKE '%{self.searched_word}%'"      
+                    if rev_day_flag :
+                        Day = now.day
+                        query += "AND day = {Day}"
+                    if rev_month_flag :
+                        Month = now.month
+                        query += "AND month = {Month}"
+                    if rev_year_flag :
+                        Year = now.year
+                        query += "AND year = {Year}"   
+                    if zero_hund_flag :
+                        query += " AND 0 <= amount <= 100"   
+                    if hund_touse_flag :
+                        query += " AND 100 < amount <= 1000"
+                    if more_flag :
+                        query += " AND 1000 < amount"  
+                        
+                    cursor1.execute(query)
+                    total_rev = cursore1.fetchall()[0]
+                    if total_rev is None:
+                        total_rev = 0
+                    final_resault += f"Total Filtered Revenue : {total_rev}"              
+                except:
+                    pass     
+            if exp_flag:  
+                try:
+                    conn2 = sql.connect(self.expense_file)
+                    cursor2 = conn2.cursor()
+                    query = '''SELECT SUM(amount) FROM EXPENSE WHERE 1 = 1'''
+                    if exp_desc :
+                        query += " AND description LIKE '%{self.searched_word}%'"
+                    if exp_type_flag :
+                        query += " AND type LIKE '%{self.searched_word}%'"
+                    if exp_source_flag :
+                        query += " AND type LIKE '%{self.searched_word}%'"      
+                    if exp_day_flag :
+                        Day = now.day
+                        query += "AND day = {Day}"
+                    if exp_month_flag :
+                        Month = now.month
+                        query += "AND month = {Month}"
+                    if exp_year_flag :
+                        Year = now.year
+                        query += "AND year = {Year}"   
+                    if zero_hund_flag :
+                        query += " AND 0 <= amount <= 100"   
+                    if hund_touse_flag :
+                        query += " AND 100 < amount <= 1000"
+                    if more_flag :
+                        query += " AND 1000 < amount"  
+                        
+                    cursor2.execute(query)
+                    total_exp = cursore2.fetchall()[0]
+                    if total_exp is None:
+                        total_exp = 0
+                    final_resault += f"Total Filtered Revenue : {total_exp}"  
+                except:
+                    pass
+                
+            self.search_view.setPlainText(final_resault)              
         
     def report(self):
         if self.current_layout == 'report':
@@ -1129,7 +1267,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         
         try:       
             rev_info = (int(self.rev_amount), self.rev_source, self.rev_desc, 
-                        self.rev_type, int(self.rev_year), self.rev_month, int(self.rev_day))
+                        self.rev_type, int(self.rev_year), self.rev_month.lower(), int(self.rev_day))
             cursor.execute(insert_query, rev_info)
             conn.commit()
             if cursor:
@@ -1169,7 +1307,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         
         #try:       
         exp_info = (int(self.exp_amount), self.exp_source, self.exp_desc, 
-                    self.exp_type, int(self.exp_year), self.exp_month, int(self.exp_day))
+                    self.exp_type, int(self.exp_year), self.exp_month.lower(), int(self.exp_day))
         cursor.execute(insert_query, exp_info)
         conn.commit()
         if cursor:
