@@ -681,4 +681,213 @@ class signup_login(MainUI) :
         self.birth_day = self.day_line_edit.text()
         self.birth_mounth = self.mounth_line_edit.text()
         self.birth_year = self.year_line_edit.text()
+
+    def close_signup_open_login(self) :
+        self.set_user_info()
+        
+        first_name_val = self.name_val(self.first_name)  
+        last_name_val = self.name_val(self.last_name)
+        password_val = self.password_val(self.password)
+        repeat_password_val = self.password_val(self.repeat_password)
+        
+        passwords_eq = (self.password == self.repeat_password)
+        
+        security_val = (self.security_question != "")
+        email_val = self.email_val(self.email)
+        phone_number_val = self.phone_number_val(self.phone_number)
+        birth_date = f"{self.birth_year}-{self.birth_mounth}"
+        day_val = self.day_val(self.birth_day, self.birth_mounth)
+        mounth_val = self.mounth_val(self.birth_mounth)
+        year_val = self.year_val(self.birth_year)
+        val_list = [first_name_val, last_name_val, password_val, repeat_password_val,
+                    passwords_eq, email_val, phone_number_val, year_val, mounth_val, day_val, security_val]
+        
+        if False in val_list :
+            if not val_list[0] :
+                if self.first_name == "" :
+                    self.first_name_label.setText("please fill the gap")
+                if not self.first_name_label.isVisible() :    
+                    self.first_name_label.setVisible(True)
+            else :
+                self.first_name_label.setVisible(False)
+                self.first_name_label.setText("first_name is not valid!")
+                
+            if not val_list[1] :
+                if self.last_name == "" :
+                    self.last_name_label.setText("please fill the gap")
+                elif self.last_name != "" :
+                    self.last_name_label.setText("last_name is not valid!")   
+                if not self.last_name_label.isVisible() :     
+                    self.last_name_label.setVisible(True)
+            else :
+                self.last_name_label.setText("last_name is not valid!")
+                self.last_name_label.setVisible(False)   
+                
+            
+            if not val_list[2] :
+                if self.password == "" :
+                    self.password_label.setText("please fill the gap")
+                elif self.password != "" :
+                    self.password_label.setText("password is not valid!")    
+                if not self.password_label.isVisible() :
+                    self.password_label.setVisible(True)
+            else : 
+                self.password_label.setVisible(False)       
+                self.password_label.setText("password is not valid!")
+            
+                    
+            if not val_list[3] :
+                if self.repeat_password == "" :
+                    self.repeat_password_label.setText("please fill the gap")
+                    
+                elif self.repeat_password != "" :
+                    self.repeat_password_label.setText("repeated_password is not valid!")
+                    #self.repeat_password_label.setVisible(True)    
+                    if self.password != "" and self.repeat_password != self.password :
+                        self.repeat_password_label.setText("not match!") 
+                    elif self.password == "" :
+                        self.repeat_password_label.setText("not match!")  
+                    self.repeat_password_label.setVisible(True)              
+                if not self.repeat_password_label.isVisible() :
+                    self.repeat_password_label.setVisible(True)
+            elif val_list[3] and self.repeat_password != self.password :
+                        self.repeat_password_label.setText("not match!")    
+                        if not self.repeat_password_label.isVisible() :
+                            self.repeat_password_label.setVisible(True)    
+            else :
+                self.repeat_password_label.setVisible(False)
+                self.repeat_password_label.setText("repeated_password is not valid!") 
+            
+            if not val_list[5] :
+                if self.email == "" :
+                    self.email_label.setText("please fill the gap")
+                elif self.email != "" :
+                    self.email_label.setText("email address is not valid!")    
+                if not self.email_label.isVisible() :
+                    self.email_label.setVisible(True)    
+            else :
+                self.email_label.setVisible(False)
+                self.email_label.setText("email address is not valid!")    
+                
+            if not val_list[6] :
+                if self.phone_number == "" :
+                    self.phone_number_label.setText("please fill the gap")
+                elif self.phone_number != "" :
+                    self.phone_number_label.setText("phone_number is not valid!")     
+                if not self.phone_number_label.isVisible() :
+                    self.phone_number_label.setVisible(True)    
+            else :
+                self.phone_number_label.setVisible(False)
+                self.phone_number_label.setText("phone_number is not valid!") 
+                
+            if not val_list[7] :
+                if self.birth_year == "" :
+                    self.year_label.setText("please fill the gap")
+                elif self.birth_year != "" :
+                    self.year_label.setText("birth_year is not valid!")     
+                if not self.year_label.isVisible() :
+                    self.year_label.setVisible(True)    
+            else :
+                self.year_label.setVisible(False)
+                self.year_label.setText("birth_year is not valid!")
+                
+            if not val_list[8] :
+                if self.birth_mounth == "" :
+                    self.mounth_label.setText("please fill the gap")
+                elif self.birth_mounth != "" :
+                    self.mounth_label.setText("birth_mounth is not valid!")     
+                if not self.mounth_label.isVisible() :
+                    self.mounth_label.setVisible(True)    
+            else :
+                self.mounth_label.setVisible(False)
+                self.mounth_label.setText("birth_mounth is not valid!")
+                
+            if not val_list[9] :
+                if self.birth_day == "" :
+                    self.day_label.setText("please fill the gap")
+                elif self.birth_day != "" :
+                    self.day_label.setText("birth_day is not valid!")     
+                if not self.day_label.isVisible() :
+                    self.day_label.setVisible(True)    
+            else :
+                self.day_label.setVisible(False)
+                self.day_label.setText("birth_day is not valid!")  
+                
+            if not val_list[10]:
+                if not self.security_question_label.isVisible():
+                    self.security_question_label.setVisible(True)
+            else :
+                if self.security_question_label.isVisible():
+                    self.security_question_label.setVisible(False)                 
+                
+            if self.city == "" :
+                if not self.city_label.isVisible():
+                    self.city_label.setVisible(True) 
+            else :
+                if self.city_label.isVisible():
+                    self.city_label.setVisible(False)                
+        else :
+            self.create_user_file()
+            if not self.close_excel_file_label.isVisible():
+                self.signup_window.close()
+                self.Login_window()
+                
+    def search_user(self, user_name, password):
+        try:
+            conn = sqlite3.connect('usersApp.db')
+            cursor = conn.cursor()
+
+            cursor.execute('''
+                SELECT first_name, last_name, user_name, password, security_answer, email, phone_number, city, birth_year, birth_month, birth_day
+                FROM users
+                WHERE user_name = ? AND password = ?
+            ''', (user_name, password))
+
+            result = cursor.fetchone()
+            if result:
+                self.first_name, self.last_name, self.user_name, self.password, self.security_question, self.email, self.phone_number, self.city, self.birth_year, self.birth_mounth, self.birth_day = result
+                flag = True
+            else:
+                flag = False
+
+            return flag
+        except sqlite3.Error as e:
+            print(f"An error occurred: {e}")
+            return False
+        finally:
+            if conn:
+                conn.close()
+            
+                
+    def check_login_inputs_val(self) :
+        user_text = self.log_user_line_edit.text()
+        pass_text = self.log_password_line_edit.text()
+        if user_text and pass_text :
+            if self.search_user(user_text, pass_text):
+                self.set_visibility(False)
+                self.login_window.close()
+                self.Main_window()
+            else :
+                self.check_error()
+        else :
+            self.check_error()      
+    
+    def set_visibility(self, isvisible):
+        self.login_label.setVisible(isvisible)
+        self.log_password_label.setVisible(isvisible) 
+        
+    def check_error(self) :
+        if self.max_error < 2 :
+            self.max_error += 1
+            if not self.login_label.isVisible():
+                self.set_visibility(True)
+        elif self.max_error == 2 :
+            if self.login_label.isVisible():
+                self.set_visibility(False)
+            self.start_timer()
+
+    def new_sign_up(self) :
+        self.sign_up_window() 
+
+# ***********  END SIGNUP_LOGIN CLASS   ************ 
            
