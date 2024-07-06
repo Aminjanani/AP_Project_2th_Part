@@ -281,4 +281,219 @@ class signup_login(MainUI) :
         self.signup_window.setWindowTitle('Signup_Login')
         self.signup_window.show()
 
-        # ***********  END SIGN UP WINDOW   ************ 
+        # ***********  END SIGN UP WINDOW   ************
+        
+        # ***********  START LOGIN WINDOW   ************  
+
+    def Login_window(self):
+        self.login_window = QMainWindow(self)
+        self.login_window.setGeometry(300, 100, 500, 400)
+        self.login_window.setStyleSheet("background-color: #33CC99")
+        
+        
+        self.timer_label = QLabel("remaining time : 00:15", self.login_window)
+        self.timer_label.setVisible(False)
+        self.timer_label.setStyleSheet('color: red')
+
+        self.log_user_line_edit = QLineEdit(self.login_window)
+        self.log_user_line_edit.setPlaceholderText("user_name")
+        self.log_user_line_edit.setStyleSheet("""
+        QLineEdit {
+           background-color: #2E5894;  
+           color: #FFFFFF;                
+           border: 1px solid #ED0A3F;     
+           border-radius: 10px;         
+           padding: 4px;
+                    
+        }
+        QLineEdit:hover {
+            background-color: #0081AB;  
+        }
+        """)
+        
+        self.login_label = QLabel("not found!", self.login_window)
+        self.login_label.setVisible(False)
+        self.login_label.setStyleSheet("color: red")
+        self.log_password_label = QLabel("not found!", self.login_window)
+        self.log_password_label.setVisible(False)
+        self.log_password_label.setStyleSheet("color: red")
+        self.show_user_label = QLabel("not found!", self.login_window)
+        self.show_user_label.setVisible(False)
+        self.show_user_label.setStyleSheet("color: red")
+        self.show_password_label = QLabel("not found!", self.login_window)
+        self.show_password_label.setVisible(False)
+        self.show_password_label.setStyleSheet("color: red")
+
+        self.log_password_line_edit = QLineEdit(self.login_window)
+        self.log_password_line_edit.setPlaceholderText("password")
+        self.log_password_line_edit.setEchoMode(QLineEdit.EchoMode.Password)
+        self.log_password_line_edit.setStyleSheet("""
+        QLineEdit {
+           background-color: #2E5894;  
+           color: #FFFFFF;                
+           border: 1px solid #ED0A3F;     
+           border-radius: 10px;         
+           padding: 4px;
+                    
+        }
+        QLineEdit:hover {
+            background-color: #0081AB;  
+        }
+        """)
+
+        self.go_to_signup_window_btn = QPushButton(self.login_window)
+        self.go_to_signup_window_btn.setText("Go To Sign Up")
+        self.go_to_signup_window_btn.setStyleSheet("""
+       QPushButton {
+          background-color: #C53151;  
+          color: #76D7EA;
+          border: 3px solid #0081AB;     
+          border-radius: 10px;         
+          padding: 4px;
+                    
+        }
+        QPushButton:hover {
+            background-color: #B768A2;  
+        }
+        """)
+
+        self.log_sub_btn = QPushButton(self.login_window)
+        self.log_sub_btn.setText("Submit")
+        self.log_sub_btn.setStyleSheet("""
+       QPushButton {
+          background-color: #C53151;  
+          color: #76D7EA;
+          border: 3px solid #0081AB;     
+          border-radius: 10px;         
+          padding: 4px;
+                    
+        }
+        QPushButton:hover {
+            background-color: #B768A2;  
+        }
+        """)
+
+        self.forgot_password_radio = QRadioButton(self.login_window)
+        self.forgot_password_radio.setText("Forgot Password ?")
+        self.forgot_password_radio.setStyleSheet("""
+        QRadioButton {
+           background-color: #2E5894;  
+           color: #FFFFFF;                
+           border: 1px solid #ED0A3F;     
+           border-radius: 10px;         
+           padding: 4px;
+                    
+        }
+        QRadioButton:hover {
+            background-color: #0081AB;  
+        }
+        """)
+
+        self.log_forgot_password_line_edit = QLineEdit(self.login_window)
+        self.log_forgot_password_line_edit.setPlaceholderText("WHAT IS YOUR FAVORITE WORD ?")
+
+        self.log_user2_line_edit = QLineEdit(self.login_window)
+        self.log_user2_line_edit.setPlaceholderText("user_name")
+        self.log_user2_line_edit.setStyleSheet("""
+        QLineEdit {
+           background-color: #2E5894;  
+           color: #FFFFFF;                
+           border: 1px solid #ED0A3F;     
+           border-radius: 10px;         
+           padding: 4px;
+                    
+        }
+        QLineEdit:hover {
+            background-color: #0081AB;  
+        }
+        """)
+
+        self.log_password2_line_edit = QLineEdit(self.login_window)
+        self.log_password2_line_edit.setPlaceholderText("WHAT IS YOUR FAVORITE WORD ?")
+        self.log_password2_line_edit.setStyleSheet("""
+        QLineEdit {
+           background-color: #2E5894;  
+           color: #FFFFFF;                
+           border: 1px solid #ED0A3F;     
+           border-radius: 10px;         
+           padding: 4px;
+                    
+        }
+        QLineEdit:hover {
+            background-color: #0081AB;  
+        }
+        """)
+
+        self.log_sub2_btn = QPushButton(self.login_window)
+        self.log_sub2_btn.setText("Submit")
+        self.log_sub2_btn.setStyleSheet("""
+       QPushButton {
+          background-color: #C53151;  
+          color: #76D7EA;
+          border: 3px solid #0081AB;     
+          border-radius: 10px;         
+          padding: 4px;
+                    
+        }
+        QPushButton:hover {
+            background-color: #B768A2;  
+        }
+        """)
+
+        self.log_central = QWidget(self)
+        self.log_layout = QVBoxLayout(self.log_central)
+        self.log_layout.setContentsMargins(200, 100, 200, 100)
+        self.log_hlayout = QHBoxLayout(self.log_central)
+        self.log_layout2 = QVBoxLayout(self.log_central)
+        
+        self.log_layout.addWidget(self.timer_label)
+        self.log_layout.addWidget(self.login_label)
+        self.log_layout.addWidget(self.log_user_line_edit)
+        self.log_layout.addWidget(self.log_password_label)
+        self.log_layout.addWidget(self.log_password_line_edit)
+        self.log_layout.addLayout(self.log_hlayout)
+        self.log_hlayout.addWidget(self.go_to_signup_window_btn)
+        self.log_hlayout.addWidget(self.log_sub_btn)
+        
+        self.log_layout.addLayout(self.log_layout2)
+        self.log_layout2.addWidget(self.show_user_label)
+        self.log_layout2.addWidget(self.log_user2_line_edit)
+        self.log_layout2.addWidget(self.show_password_label)
+        self.log_layout2.addWidget(self.log_password2_line_edit)
+        self.log_layout2.addWidget(self.log_sub2_btn)
+        self.log_user2_line_edit.hide()
+        self.log_password2_line_edit.hide()
+        self.log_sub2_btn.hide()
+
+        self.button_group = QButtonGroup(self)
+        self.button_group.setExclusive(False)
+        self.button_group.addButton(self.forgot_password_radio)
+        self.forgot_password_radio.toggled.connect(self.radio_toggled)
+        self.log_hlayout.addWidget(self.forgot_password_radio)
+        self.show_password = QLineEdit(self.login_window)
+        self.show_password.setReadOnly(True)
+        self.show_password.setStyleSheet("""
+        QLineEdit {
+           background-color: #2E5894;  
+           color: #FFFFFF;                
+           border: 1px solid #ED0A3F;     
+           border-radius: 10px;         
+           padding: 4px;
+                    
+        }
+        QLineEdit:hover {
+            background-color: #0081AB;  
+        }
+        """)
+        self.log_layout2.addWidget(self.show_password)
+        self.show_password.hide()
+
+        self.go_to_signup_window_btn.clicked.connect(self.go_to_sign_up)
+        self.log_sub_btn.clicked.connect(self.check_login_inputs_val)
+        self.log_sub2_btn.clicked.connect(self.show_pass)
+
+        self.login_window.setCentralWidget(self.log_central)
+        self.login_window.setWindowTitle('Signup_Login')
+        self.login_window.show()
+        
+    #***********  END LOGIN WINDOW   ************
