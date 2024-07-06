@@ -32,9 +32,12 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.exp_desc = ""
         self.exp_type = ""
         self.searched_word = ""
-        self.revenue_file = self.user_name + f"_revenue.db"
-        self.expense_file = self.user_name + f"_expense.db"
-        self.category_file = self.user_name + f"_category.db"
+        #self.revenue_file = self.user_name + f"_revenue.db"
+        self.revenue_file = f"amin_revenue.db"
+        #self.expense_file = self.user_name + f"_expense.db"
+        self.expense_file = f"amin_expense.db"
+        #self.category_file = self.user_name + f"_category.db"
+        self.category_file = f"amin_category.db"
         self.Main_window()
 
     def Main_window(self):
@@ -170,7 +173,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         #self.btn_search.clicked.connect(self.search)
         #self.btn_report.clicked.connect(self.report)
         #self.btn_settings.clicked.connect(self.settings)
-        #self.btn_exit.clicked.connect(self.exit)
+        self.btn_exit.clicked.connect(self.exit)
 
         self.setCentralWidget(self.mainWidget)
         self.show()
@@ -312,7 +315,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
 
         self.type_of_revenue_combo_box.activated[int].connect(self.set_revenue_line)
         
-        #self.btn_sub_revenue.clicked.connect(self.take_rev)
+        self.btn_sub_revenue.clicked.connect(self.take_rev)
         
     def set_rev_attr(self):
         self.rev_amount = self.amount_of_revenue_line.text()
@@ -633,7 +636,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
             if self.type_of_expense_label.isVisible() :
                     self.type_of_expense_label.setVisible(False)                           
             self.set_exp_attr()
-            #self.create_user_expense_file()  
+            self.create_user_expense_database()  
             
     def category(self):
         if self.current_layout == 'category':
@@ -1107,15 +1110,32 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         conn =  sql.connect(self.revenue_file)   
         cursor = conn.cursor()
         
-        create_query = '''CREATE TABLE IF NOT EXISTS REVENUE (amount INT NOT NULL, source TEXT NOT NULL,
-                          description TEXT, type TEXT , year INT, month TEXT, day INT)
-                          VALUE (?, ?, ?, ?, ?, ?, ?)'''
+        create_table_query = '''CREATE TABLE IF NOT EXISTS REVENUE (
+                                amount INT NOT NULL,
+                                source TEXT NOT NULL,
+                                description TEXT,
+                                type TEXT NOT NULL,
+                                year INT NOT NULL,
+                                month TEXT NOT NULL,
+                                day INT NULL, 
+                                UNIQUE(amount, source, 
+                                description, type, year, month, day))'''
+                          
+        cursor.execute(create_table_query)
+        conn.commit()
+        
+        insert_query = '''INSERT OR IGNORE INTO REVENUE (amount, source, description, type, year, month, day)
+                          VALUES (?, ?, ?, ?, ?, ?, ?)'''                 
         
         try:       
-            rev_info = [self.rev_amount, self.rev_source, self.rev_desc, 
-                        self.rev_type, self.rev_year, self.rev_month, self.rev_day] 
-            cursor.execute(create_query, rev_info)
+            rev_info = (int(self.rev_amount), self.rev_source, self.rev_desc, 
+                        self.rev_type, int(self.rev_year), self.rev_month, int(self.rev_day))
+            cursor.execute(insert_query, rev_info)
             conn.commit()
+            if cursor:
+                cursor.close()
+            if conn:    
+                conn.close()
         except:
             if not self.close_rev_file_label.isVisible():
                 self.close_rev_file_label.setVisible(True)     
@@ -1125,6 +1145,57 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         except:
             if not self.close_rev_file_label.isVisible():
                 self.close_rev_file_label.setVisible(True) 
+                
+    def create_user_expense_database(self):
+        conn =  sql.connect(self.expense_file)   
+        cursor = conn.cursor()
+        
+        create_table_query = '''CREATE TABLE IF NOT EXISTS EXPENSE (
+                                amount INT NOT NULL,
+                                source TEXT NOT NULL,
+                                description TEXT,
+                                type TEXT NOT NULL,
+                                year INT NOT NULL,
+                                month TEXT NOT NULL,
+                                day INT NULL, 
+                                UNIQUE(amount, source, 
+                                description, type, year, month, day))'''
+                          
+        cursor.execute(create_table_query)
+        conn.commit()
+        
+        insert_query = '''INSERT OR IGNORE INTO EXPENSE (amount, source, description, type, year, month, day)
+                          VALUES (?, ?, ?, ?, ?, ?, ?)'''                 
+        
+        #try:       
+        exp_info = (int(self.exp_amount), self.exp_source, self.exp_desc, 
+                    self.exp_type, int(self.exp_year), self.exp_month, int(self.exp_day))
+        cursor.execute(insert_query, exp_info)
+        conn.commit()
+        if cursor:
+            cursor.close()
+        if conn:    
+            conn.close()
+        #except:
+        #if not self.close_rev_file_label.isVisible():
+            #self.close_rev_file_label.setVisible(True)  
+        
+        try:    
+            if self.close_exp_file_label.isVisible():
+                self.close_exp_file_label.setVisible(False)
+        except:
+            if not self.close_exp_file_label.isVisible():
+                self.close_exp_file_label.setVisible(True)  
+                
+    def create_user_category_database(self):
+        if not os.path.exists(self.category_file):
+            Columns = ['category'] 
+            df = pd.DataFrame(columns = Columns)
+            
+            for category_item in self.category_combo:
+                df[len(df)] = category_item
+                
+            df.to_excel(self.category_file, index = False)                       
                 
     def exit(self):
         self.close()
