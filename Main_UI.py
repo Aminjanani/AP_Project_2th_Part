@@ -17,6 +17,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         super().__init__()  
         user.__init__(self)
         Validation.check_validation.__init__(self)
+        self.window_title = 'Main Menu'
         self.rev_amount = ""
         self.rev_day = ""
         self.rev_month = ""
@@ -41,7 +42,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.Main_window()
 
     def Main_window(self):
-        
+        self.setWindowTitle(self.window_title)
         self.setGeometry(400, 100, 600, 300)
         self.mainWidget = Validation.QWidget(self)
         self.mainLayout = Validation.QHBoxLayout(self.mainWidget)
