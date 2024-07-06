@@ -497,3 +497,60 @@ class signup_login(MainUI) :
         self.login_window.show()
         
     #***********  END LOGIN WINDOW   ************
+
+    def start_timer(self) :
+        self.end_time = QDateTime.currentDateTime().addSecs(self.countdown)  
+        self.timer = QTimer(self.login_window)
+        self.timer.timeout.connect(self.update_time)
+        self.timer.start(1000)
+        
+        self.timer_label.setVisible(True)
+        self.log_user_line_edit.setReadOnly(True)
+        self.log_password_line_edit.setReadOnly(True)
+        self.log_user2_line_edit.setReadOnly(True)
+        self.log_password2_line_edit .setReadOnly(True)
+        self.log_forgot_password_line_edit.setReadOnly(True)
+        self.log_sub_btn.setEnabled(False)
+        self.log_sub2_btn.setEnabled(False)
+        self.go_to_signup_window_btn.setEnabled(False)
+        self.forgot_password_radio.setEnabled(False)
+        
+    # updating time     
+    def update_time(self):
+        current_time = QDateTime.currentDateTime()
+        remaining_time = self.end_time.toSecsSinceEpoch() - current_time.toSecsSinceEpoch()
+        
+        if remaining_time <= 0:
+            self.timer.stop()
+            self.timer_label.setText("remaining time : 00:00")
+            self.max_error = 0
+            self.timer_label.setVisible(False)
+            self.log_user_line_edit.setReadOnly(False)
+            self.log_password_line_edit.setReadOnly(False)
+            self.log_user2_line_edit.setReadOnly(False)
+            self.log_password2_line_edit .setReadOnly(False)
+            self.log_forgot_password_line_edit.setReadOnly(False)
+            self.log_sub_btn.setEnabled(True)
+            self.log_sub2_btn.setEnabled(True)
+            self.go_to_signup_window_btn.setEnabled(True)
+            self.forgot_password_radio.setEnabled(True)
+            
+        minutes = remaining_time // 60
+        seconds = remaining_time % 60
+        self.timer_label.setText(f"remaining time : {minutes:02d}:{seconds:02d}")
+                
+    def go_to_sign_up(self):
+        self.login_window.close()
+        self.sign_up_window()
+
+    def radio_toggled(self, checked):
+        if checked :
+            self.log_user2_line_edit.show()
+            self.log_password2_line_edit.show()
+            self.log_sub2_btn.show()
+                
+        else:
+            self.log_user2_line_edit.hide()
+            self.log_password2_line_edit.hide()
+            self.log_sub2_btn.hide()
+           
