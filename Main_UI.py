@@ -170,7 +170,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.btn_revenue.clicked.connect(self.revenue)
         self.btn_expense.clicked.connect(self.expense)
         self.btn_category.clicked.connect(self.category)
-        #self.btn_search.clicked.connect(self.search)
+        self.btn_search.clicked.connect(self.search)
         #self.btn_report.clicked.connect(self.report)
         #self.btn_settings.clicked.connect(self.settings)
         self.btn_exit.clicked.connect(self.exit)
@@ -755,7 +755,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.search_view = Validation.QTextBrowser()
         self.leftLayout.addWidget(self.search_view)
         self.search_view.setStyleSheet(self.view_style)
-        #self.btn_searching.clicked.connect(self.search_logic)
+        self.btn_searching.clicked.connect(self.search_logic)
         
     def find_month(self, month):
         itr = 1
@@ -821,78 +821,87 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
             if self.value_more_than_1000_dollar_check.isChecked():
                 more_flag = True
             
-            #pattern = f"{self.searched_word}" 
             now = Validation.datetime.now()
+            Day = now.day
+            Month = now.month
+            Year = now.year
             final_resault = ""    
             if rev_flag:
-                try:    
+                try:  
+                    filter_list = []  
                     conn1 = sql.connect(self.revenue_file)
                     cursor1 = conn1.cursor()
                     query = '''SELECT SUM(amount) FROM REVENUE WHERE 1 = 1'''
-                    if rev_desc :
-                        query += " AND description LIKE '%{self.searched_word}%'"
-                    if rev_type_flag :
-                        query += " AND type LIKE '%{self.searched_word}%'"
-                    if rev_source_flag :
-                        query += " AND type LIKE '%{self.searched_word}%'"      
-                    if rev_day_flag :
-                        Day = now.day
-                        query += "AND day = {Day}"
-                    if rev_month_flag :
-                        Month = now.month
-                        query += "AND month = {Month}"
-                    if rev_year_flag :
-                        Year = now.year
-                        query += "AND year = {Year}"   
-                    if zero_hund_flag :
+                    if rev_desc:
+                        query += " AND description LIKE '%' || ? || '%'"
+                        filter_list.append(self.searched_word)
+                    if rev_type_flag:
+                        query += " AND type LIKE '%' || ? || '%'"
+                        filter_list.append(self.searched_word)
+                    if rev_source_flag:
+                        query += " AND type LIKE '%' || ? || '%'"
+                        filter_list.append(self.searched_word)      
+                    if rev_day_flag:
+                        query += "AND day = ?"
+                        filter_list.append(Day)
+                    if rev_month_flag:
+                        query += "AND month = ?"
+                        filter_list.append(Month)
+                    if rev_year_flag:
+                        query += "AND year = ?" 
+                        filter_list.append(Year)  
+                    if zero_hund_flag:
                         query += " AND 0 <= amount <= 100"   
-                    if hund_touse_flag :
+                    if hund_touse_flag:
                         query += " AND 100 < amount <= 1000"
-                    if more_flag :
-                        query += " AND 1000 < amount"  
+                    if more_flag:
+                        query += " AND amount > 1000"  
                         
-                    cursor1.execute(query)
-                    total_rev = cursore1.fetchall()[0]
+                    cursor1.execute(query, tuple(filter_list))
+                    total_rev = cursor1.fetchone()[0]
                     if total_rev is None:
                         total_rev = 0
-                    final_resault += f"Total Filtered Revenue : {total_rev}"              
+                    final_resault += f"Total Filtered Revenue : {total_rev}\n"              
                 except:
                     pass     
             if exp_flag:  
                 try:
+                    filter_list = [] 
                     conn2 = sql.connect(self.expense_file)
                     cursor2 = conn2.cursor()
                     query = '''SELECT SUM(amount) FROM EXPENSE WHERE 1 = 1'''
-                    if exp_desc :
-                        query += " AND description LIKE '%{self.searched_word}%'"
-                    if exp_type_flag :
-                        query += " AND type LIKE '%{self.searched_word}%'"
-                    if exp_source_flag :
-                        query += " AND type LIKE '%{self.searched_word}%'"      
-                    if exp_day_flag :
-                        Day = now.day
-                        query += "AND day = {Day}"
-                    if exp_month_flag :
-                        Month = now.month
-                        query += "AND month = {Month}"
-                    if exp_year_flag :
-                        Year = now.year
-                        query += "AND year = {Year}"   
-                    if zero_hund_flag :
+                    if exp_desc:
+                        query += " AND description LIKE '%' || ? || '%'"
+                        filter_list.append(self.searched_word)
+                    if exp_type_flag:
+                        query += " AND type LIKE '%' || ? || '%'"
+                        filter_list.append(self.searched_word)
+                    if exp_source_flag:
+                        query += " AND type LIKE '%' || ? || '%'"
+                        filter_list.append(self.searched_word)     
+                    if exp_day_flag:
+                        query += "AND day = ?"
+                        filter_list.append(Day)
+                    if exp_month_flag:
+                        query += "AND month = ?"
+                        filter_list.append(Month)
+                    if exp_year_flag:
+                        query += "AND year = ?" 
+                        filter_list.append(Year)   
+                    if zero_hund_flag:
                         query += " AND 0 <= amount <= 100"   
-                    if hund_touse_flag :
+                    if hund_touse_flag:
                         query += " AND 100 < amount <= 1000"
-                    if more_flag :
-                        query += " AND 1000 < amount"  
+                    if more_flag:
+                        query += " AND amount > 1000"  
                         
-                    cursor2.execute(query)
-                    total_exp = cursore2.fetchall()[0]
+                    cursor2.execute(query, tuple(filter_list))
+                    total_exp = cursor2.fetchone()[0]
                     if total_exp is None:
                         total_exp = 0
-                    final_resault += f"Total Filtered Revenue : {total_exp}"  
+                    final_resault += f"Total Filtered Expense : {total_exp}"  
                 except:
                     pass
-                
             self.search_view.setPlainText(final_resault)              
         
     def report(self):
@@ -1274,10 +1283,6 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
                 cursor.close()
             if conn:    
                 conn.close()
-        except:
-            if not self.close_rev_file_label.isVisible():
-                self.close_rev_file_label.setVisible(True)     
-        try :
             if self.close_rev_file_label.isVisible():
                 self.close_rev_file_label.setVisible(False)
         except:
@@ -1305,20 +1310,15 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         insert_query = '''INSERT OR IGNORE INTO EXPENSE (amount, source, description, type, year, month, day)
                           VALUES (?, ?, ?, ?, ?, ?, ?)'''                 
         
-        #try:       
-        exp_info = (int(self.exp_amount), self.exp_source, self.exp_desc, 
-                    self.exp_type, int(self.exp_year), self.exp_month.lower(), int(self.exp_day))
-        cursor.execute(insert_query, exp_info)
-        conn.commit()
-        if cursor:
-            cursor.close()
-        if conn:    
-            conn.close()
-        #except:
-        #if not self.close_rev_file_label.isVisible():
-            #self.close_rev_file_label.setVisible(True)  
-        
-        try:    
+        try:       
+            exp_info = (int(self.exp_amount), self.exp_source, self.exp_desc, 
+                        self.exp_type, int(self.exp_year), self.exp_month.lower(), int(self.exp_day))
+            cursor.execute(insert_query, exp_info)
+            conn.commit()
+            if cursor:
+                cursor.close()
+            if conn:    
+                conn.close()    
             if self.close_exp_file_label.isVisible():
                 self.close_exp_file_label.setVisible(False)
         except:
