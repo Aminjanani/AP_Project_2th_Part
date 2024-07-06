@@ -553,4 +553,132 @@ class signup_login(MainUI) :
             self.log_user2_line_edit.hide()
             self.log_password2_line_edit.hide()
             self.log_sub2_btn.hide()
+    def find_user_pass(self, user_name, security_answer):
+        conn = sqlite3.connect('usersApp.db')
+        cursor = conn.cursor()
+
+        cursor.execute('''
+            SELECT password FROM users WHERE user_name = ? AND security_answer = ?
+        ''', (user_name, security_answer))
+
+        result = cursor.fetchone()
+        conn.close()
+        if result:
+            return result[0]
+        else:
+            return None
+        
+
+    def show_pass(self) :
+        if not self.show_password.isVisible() :
+            self.show_password.setVisible(True)
+        log_text = self.log_user2_line_edit.text() 
+        pass_text = self.log_password2_line_edit.text()  
+        resault = self.find_user_pass(log_text, pass_text)     
+        if resault is not None :
+            self.show_password.setText(f"{resault}")
+        else :
+            self.show_password.setText(f"password does not exist")       
+            
+    def update_combo_box(self, text) :
+        self.city_combo_box.clear()
+        for word in self.default_cities :
+            if text.lower() in word.lower() :
+                self.city_combo_box.addItem(word) 
+                
+    def set_city_line_edit(self, index) :
+        text = self.city_combo_box.itemText(index)
+        self.city_line_edit.setText(text) 
+
+    def set_year_line_edit(self, index) :
+        text = self.year_combo_box.itemText(index)
+        self.year_line_edit.setText(text)
+
+    def set_mounth_line_edit(self, index) :
+        text = self.mounth_combo_box.itemText(index)
+        self.mounth_line_edit.setText(text)
+
+    def set_day_line_edit(self, index) :
+        text = self.day_combo_box.itemText(index)
+        self.day_line_edit.setText(text)                 
+      
+    def open_login_window(self) :
+        self.signup_window.close()
+        self.login_window = QMainWindow() 
+        self.central_widget = QWidget()
+        self.login_window.setGeometry(100, 100, 500, 500)
+        self.layout = QVBoxLayout(self.central_widget)
+        self.line_edit3 = QPushButton("btn_login", self.central_widget)
+        self.layout.addWidget(self.line_edit3) 
+        self.central_widget.setLayout(self.layout)
+        self.layout.setContentsMargins(390, 40, 390, 40)
+        self.login_window.setCentralWidget(self.central_widget)
+        
+        self.login_window.setWindowTitle('QLineEdit')
+        self.login_window.show()
+        
+    def create_user_file(self):
+        try:
+            conn = sqlite3.connect('usersApp.db')
+            cursor = conn.cursor()
+
+            #create table if not exist user
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS users (
+                    first_name TEXT,
+                    last_name TEXT,
+                    user_name TEXT PRIMARY KEY,
+                    password TEXT,
+                    security_answer TEXT,
+                    email TEXT,
+                    phone_number TEXT,
+                    city TEXT,
+                    birth_year TEXT,
+                    birth_month TEXT,
+                    birth_day TEXT
+                )
+            ''')
+
+            user_info = (self.first_name, self.last_name, self.user_name, self.password, self.security_question, self.email,
+                        self.phone_number, self.city, self.birth_year, self.birth_mounth, self.birth_day)
+
+            
+            cursor.execute('SELECT * FROM users WHERE user_name = ?', (self.user_name,))
+            existing_user = cursor.fetchone()
+            if existing_user:
+                flag = True
+            else:
+                flag = False
+
+            if not flag:
+                cursor.execute('''
+                    INSERT INTO users (first_name, last_name, user_name, password, security_answer, email, phone_number, city, birth_year, birth_month, birth_day)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', user_info)
+                conn.commit()
+
+                if self.close_excel_file_label.isVisible():
+                    self.close_excel_file_label.setVisible(False)
+        except sqlite3.Error as e:
+            print(f"An error occurred: {e}")
+            if not self.close_excel_file_label.isVisible():
+                self.close_excel_file_label.setVisible(True)
+        finally:
+            if conn:
+                conn.close()
+
+        
+    def set_user_info(self):
+        self.first_name = self.first_name_line_edit.text()
+        self.last_name = self.last_name_line_edit.text() 
+        self.user_name = self.user_name_line_edit.text()
+        self.password = self.password_line_edit.text()
+        self.repeat_password = self.repeat_password_line_edit.text()
+        self.security_question = self.security_question_line_edit.text()
+        self.email = self.email_line_edit.text()
+        self.phone_number = self.phone_number_line_edit.text()
+        self.city = self.city_line_edit.text()
+        self.birth_day = self.day_line_edit.text()
+        self.birth_mounth = self.mounth_line_edit.text()
+        self.birth_year = self.year_line_edit.text()
            
