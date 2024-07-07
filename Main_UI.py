@@ -1,6 +1,7 @@
 from User import user
 import Validation
 import sqlite3 as sql
+import os
 
 # This class contains the main menu of the app, including the revenue, expence, category, search, report and setting pages as well as exit button.
 class MainUI(Validation.QMainWindow, user, Validation.check_validation):
@@ -39,6 +40,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.expense_file = f"amin_expense.db"
         #self.category_file = self.user_name + f"_category.db"
         self.category_file = f"amin_category.db"
+        self.curr_dir = os.path.dirname(os.path.abspath(__file__))
         self.Main_window()
 
     def Main_window(self):
@@ -1171,7 +1173,8 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         if rev_flag:   
             filters = []
             filter_selected = False
-            conn1 = sql.connect(self.revenue_file)
+            db_path = os.path.join(self.curr_dir, self.revenue_file)
+            conn1 = sql.connect(db_path)
             cursor1 = conn1.cursor()
             query = '''SELECT SUM(amount) FROM REVENUE WHERE 1 = 1'''
             
@@ -1321,7 +1324,8 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         if exp_flag:   
             filters = [] 
             filter_selected = False
-            conn2 = sql.connect(self.expense_file)
+            db_path = os.path.join(self.curr_dir, self.expense_file)
+            conn2 = sql.connect(db_path)
             cursor2 = conn2.cursor()
             query = '''SELECT SUM(amount) FROM EXPENSE WHERE 1 = 1'''
             #try:        
@@ -1640,7 +1644,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.change_info_btn.clicked.connect(self.change_information)
         #self.delete_user.clicked.connect(self.Delete_User)
         
-    def change_information(self) :
+    def change_information(self):
         first_name = self.first_name_line_edit2.text()
         last_name = self.last_name_line_edit2.text()
         #user_name = self.user_name_line_edit2.text()
@@ -1667,90 +1671,92 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         info_val_list = [first_name_val, last_name_val, password_val, re_password_val, 
                          email_val, phone_number_val, city_val, day_val, month_val, year_val]
         
-        if False in info_val_list :
-            if not info_val_list[0] :
-                if not self.err_lab_firstname.isVisible() :
+        if False in info_val_list:
+            if not info_val_list[0]:
+                if not self.err_lab_firstname.isVisible():
                     self.err_lab_firstname.setVisible(True)
-            else :
-                if self.err_lab_firstname.isVisible() :
+            else:
+                if self.err_lab_firstname.isVisible():
                     self.err_lab_firstname.setVisible(False)
-            if not info_val_list[1] :
-                if not self.err_lab_lastname.isVisible() :
+            if not info_val_list[1]:
+                if not self.err_lab_lastname.isVisible():
                     self.err_lab_lastname.setVisible(True)
-            else :
-                if self.err_lab_lastname.isVisible() :
+            else:
+                if self.err_lab_lastname.isVisible():
                     self.err_lab_lastname.setVisible(False)
-            if not info_val_list[2] :
-                if not self.err_lab_password.isVisible() :
+            if not info_val_list[2]:
+                if not self.err_lab_password.isVisible():
                     self.err_lab_password.setVisible(True)
-            else :
-                if self.err_lab_password.isVisible() :
+            else:
+                if self.err_lab_password.isVisible():
                     self.err_lab_password.setVisible(False)
-            if not info_val_list[3] :
-                if not self.err_lab_repassword.isVisible() :
+            if not info_val_list[3]:
+                if not self.err_lab_repassword.isVisible():
                     self.err_lab_repassword.setVisible(True)
-            else :
-                if self.err_lab_repassword.isVisible() :
+            else:
+                if self.err_lab_repassword.isVisible():
                     self.err_lab_repassword.setVisible(False)
-            if not info_val_list[4] :
-                if not self.err_lab_email.isVisible() :
+            if not info_val_list[4]:
+                if not self.err_lab_email.isVisible():
                     self.err_lab_email.setVisible(True)
-            else :
-                if self.err_lab_email.isVisible() :
+            else:
+                if self.err_lab_email.isVisible():
                     self.err_lab_email.setVisible(False) 
-            if not info_val_list[5] :
-                if not self.err_lab_phone.isVisible() :
+            if not info_val_list[5]:
+                if not self.err_lab_phone.isVisible():
                     self.err_lab_phone.setVisible(True)
-            else :
-                if self.err_lab_phone.isVisible() :
+            else:
+                if self.err_lab_phone.isVisible():
                     self.err_lab_phone.setVisible(False)  
-            if not info_val_list[6] :
-                if not self.err_lab_city.isVisible() :
+            if not info_val_list[6]:
+                if not self.err_lab_city.isVisible():
                     self.err_lab_city.setVisible(True)
-            else :
-                if self.err_lab_city.isVisible() :
+            else:
+                if self.err_lab_city.isVisible():
                     self.err_lab_city.setVisible(False)
-            if not info_val_list[7] :
-                if not self.err_lab_day.isVisible() :
+            if not info_val_list[7]:
+                if not self.err_lab_day.isVisible():
                     self.err_lab_day.setVisible(True)
-            else :
-                if self.err_lab_day.isVisible() :
+            else:
+                if self.err_lab_day.isVisible():
                     self.err_lab_day.setVisible(False) 
-            if not info_val_list[8] :
-                if not self.err_lab_month.isVisible() :
+            if not info_val_list[8]:
+                if not self.err_lab_month.isVisible():
                     self.err_lab_month.setVisible(True)
-            else :
-                if self.err_lab_month.isVisible() :
+            else:
+                if self.err_lab_month.isVisible():
                     self.err_lab_month.setVisible(False) 
-            if not info_val_list[9] :
-                if not self.err_lab_year.isVisible() :
+            if not info_val_list[9]:
+                if not self.err_lab_year.isVisible():
                     self.err_lab_year.setVisible(True)
-            else :
-                if self.err_lab_year.isVisible() :
+            else:
+                if self.err_lab_year.isVisible():
                     self.err_lab_year.setVisible(False)                                                              
-        else :
-            if self.err_lab_firstname.isVisible() :
+        else:
+            if self.err_lab_firstname.isVisible():
                     self.err_lab_firstname.setVisible(False)
-            if self.err_lab_lastname.isVisible() :
+            if self.err_lab_lastname.isVisible():
                     self.err_lab_lastname.setVisible(False)  
-            if self.err_lab_password.isVisible() :
+            if self.err_lab_password.isVisible():
                     self.err_lab_password.setVisible(False)
-            if self.err_lab_repassword.isVisible() :
+            if self.err_lab_repassword.isVisible():
                     self.err_lab_repassword.setVisible(False)  
-            if self.err_lab_email.isVisible() :
+            if self.err_lab_email.isVisible():
                     self.err_lab_email.setVisible(False)  
-            if self.err_lab_phone.isVisible() :
+            if self.err_lab_phone.isVisible():
                     self.err_lab_phone.setVisible(False) 
-            if self.err_lab_city.isVisible() :
+            if self.err_lab_city.isVisible():
                     self.err_lab_city.setVisible(False)
-            if self.err_lab_day.isVisible() :
+            if self.err_lab_day.isVisible():
                     self.err_lab_day.setVisible(False) 
-            if self.err_lab_month.isVisible() :
+            if self.err_lab_month.isVisible():
                     self.err_lab_month.setVisible(False)
-            if self.err_lab_year.isVisible() :
+            if self.err_lab_year.isVisible():
                     self.err_lab_year.setVisible(False)                                                                   
             
-            change_conn = sql.connect(self.users_file)
+            db_path = os.path.join(self.curr_dir, self.users_file)
+            
+            change_conn = sql.connect(db_path )
             change_cursor = change_conn.cursor()
             
             create_query = '''CREATE TABLE IF NOT EXISTS USERS (first_name, last_name,
@@ -1818,12 +1824,12 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
             self.birth_mounth = month
             self.birth_year = year    
             
-    def Delete_User(self) :
+    def Delete_User(self):
         delete_text = ""
         delete_text = self.delete_info_line.text()
         
-        if delete_text != "" :
-            if self.delete_err.isVisible() :
+        if delete_text != "":
+            if self.delete_err.isVisible():
                 self.delete_err.setVisible(False) 
              
             revenue_file = self.user_name + f"_revenue.xlsx"
@@ -1879,7 +1885,8 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
                 self.delete_err.setVisible(True)         
         
     def create_user_revenue_databse(self): 
-        conn =  sql.connect(self.revenue_file)   
+        db_path = os.path.join(self.curr_dir, self.revenue_file)
+        conn =  sql.connect(db_path)   
         cursor = conn.cursor()
         
         create_table_query = '''CREATE TABLE IF NOT EXISTS REVENUE (
@@ -1917,7 +1924,8 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
                 self.close_rev_file_label.setVisible(True) 
                 
     def create_user_expense_database(self):
-        conn =  sql.connect(self.expense_file)   
+        db_path = os.path.join(self.curr_dir, self.expense_file)
+        conn =  sql.connect(db_path)   
         cursor = conn.cursor()
         
         create_table_query = '''CREATE TABLE IF NOT EXISTS EXPENSE (
