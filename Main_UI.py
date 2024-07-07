@@ -1167,7 +1167,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         if self.digital_check.isChecked():
             digital_flag = True    
             
-        final_ans = "NTH " 
+        final_ans = f"Report :\n" 
         if rev_flag:   
             filters = []
             filter_selected = False
@@ -1227,10 +1227,10 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
                 query += " OR 1 = 1) AND (1 = 0"
                 
             if zero_hund_flag:
-                query += " OR 0 <= amount <= 100"
+                query += " OR amount BETWEEN 0 AND 100"
                
             if hund_thous_flag:
-                query += " OR 100 < amount <= 1000"
+                query += " OR amount BETWEEN 100 AND 1000"
                     
             if more_flag:
                 query += " OR amount > 1000"
@@ -1279,7 +1279,40 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
             else:   
                 total = total_rev
                     
-            final_ans += f"total filtered revenue : {total}\ntotal revenue : {total_rev}\n"  
+            final_ans += f"Revenue :\ntotal filtered revenue : {total}  /  total revenue : {total_rev}  /  ratio : {(total / total_rev) * 100}\n" 
+            
+            type_query = '''SELECT type, SUM(amount)
+                            FROM REVENUE
+                            GROUP BY type
+                            '''
+            cursor1.execute(type_query)   
+            type_rep = cursor1.fetchall()
+            conn1.commit() 
+            
+            rev_labels = []
+            rev_sizes = []
+            for row in type_rep:
+                rev_labels.append(row[0])
+                rev_sizes.append(row[1])
+                final_ans += f"type: {row[0]} / amount of type: {row[1]} / ratio to total: %{(row[1] / total_rev) * 100}\n" 
+                final_ans += f"ratio to fitered amount(filterd_amount/type_amount): %{(total / row[1]) * 100}\n"
+                
+            source_query = '''SELECT source, SUM(amount)
+                              FROM REVENUE
+                              GROUP BY source
+                            '''
+            cursor1.execute(source_query)   
+            source_rep = cursor1.fetchall()
+            conn1.commit() 
+            
+            rev_source_labels = []
+            rev_source_sizes = []
+            for row in source_rep:
+                rev_source_labels.append(row[0])
+                rev_source_sizes.append(row[1])
+                final_ans += f"source : {row[0]} / amount of source : {row[1]} / ratio : %{(row[1] / total_rev) * 100}" 
+                final_ans += f"ratio to fitered amount(filterd_amount/source_amount): %{(total / row[1]) * 100}\n"     
+             
             conn1.close()
             #except :
                 #pass     
@@ -1292,7 +1325,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
             query = '''SELECT SUM(amount) FROM EXPENSE WHERE 1 = 1'''
             #try:        
             cursor2.execute(query)
-            total_rev = cursor2.fetchone()[0]
+            total_exp = cursor2.fetchone()[0]
                
             query += " AND (1 = 1"     
             if False not in rep_val_list:
@@ -1305,7 +1338,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
                 min_day, max_day = min(rep_from_day, rep_until_day), max(rep_from_day, rep_until_day) 
                 min_month, max_month = min(rep_from_month, rep_until_month), max(rep_from_month, rep_until_month) 
                 min_year, max_year = min(rep_from_year, rep_until_year), max(rep_from_year, rep_until_year) 
-                conn1.create_function('MONTH_INDEX', 1, self.month_index)
+                conn2.create_function('MONTH_INDEX', 1, self.month_index)
                 query += " AND day BETWEEN ? AND ?"
                 filters.append(min_day)
                 filters.append(max_day)
@@ -1342,10 +1375,10 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
                 query += " OR 1 = 1) AND (1 = 0"
                 
             if zero_hund_flag:
-                query += " OR 0 <= amount <= 100"
+                query += " OR amount BETWEEN 0 AND 100"
                
             if hund_thous_flag:
-                query += " OR 100 < amount <= 1000"
+                query += " OR amount BETWEEN 100 AND 1000"
                     
             if more_flag:
                 query += " OR amount > 1000"
@@ -1392,9 +1425,42 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
                 if total is None:
                     total = 0 
             else:   
-                total = total_rev
+                total = total_exp
                     
-            final_ans += f"total filtered revenue : {total}\ntotal revenue : {total_rev}\n" 
+            final_ans += f"Expense :\ntotal filtered expense : {total} / total expense : {total_exp} / ratio : %{(total / total_exp) * 100}\n"
+            
+            type_query = '''SELECT type, SUM(amount)
+                            FROM EXPENSE
+                            GROUP BY type
+                            '''
+            cursor2.execute(type_query)   
+            type_rep = cursor2.fetchall()
+            conn2.commit() 
+            
+            exp_type_labels = []
+            exp_type_sizes = []
+            for row in type_rep:
+                exp_type_labels.append(row[0])
+                exp_type_sizes.append(row[1])
+                final_ans += f"type : {row[0]} / amount of type : {row[1]} / ratio : %{(row[1] / total_exp) * 100}" 
+                final_ans += f"ratio to fitered amount(filterd_amount/type_amount): %{(total / row[1]) * 100}\n"  
+                
+            source_query = '''SELECT source, SUM(amount)
+                              FROM EXPENSE
+                              GROUP BY source
+                            '''
+            cursor2.execute(source_query)   
+            source_rep = cursor2.fetchall()
+            conn2.commit() 
+            
+            exp_source_labels = []
+            exp_source_sizes = []
+            for row in source_rep:
+                exp_source_labels.append(row[0])
+                exp_source_sizes.append(row[1])
+                final_ans += f"source : {row[0]} / amount of source : {row[1]} / ratio : %{(row[1] / total_exp) * 100}" 
+                final_ans += f"ratio to fitered amount(filterd_amount/source_amount): %{(total / row[1]) * 100}\n"            
+            
             conn2.close()
             #except:
                 #pass
