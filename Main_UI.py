@@ -245,7 +245,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.source_of_revenue_combo_box = Validation.QComboBox()
         self.source_of_revenue_combo_box.setStyleSheet(self.combo_main_style)
 
-        #self.add_item_category_combo()
+        self.add_item_category_combo()
 
         self.description_revenue_line = Validation.QLineEdit()
         self.description_revenue_line.setPlaceholderText("Description Of Revenue")
@@ -677,7 +677,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.category_label.hide()
         self.category_label_err.hide()
 
-        #self.add_btn.clicked.connect(self.add_text_to_excel)
+        self.add_btn.clicked.connect(self.add_text_to_db)
         #self.df = pd.DataFrame(columns = ['Category'])        
             
     def search(self):
@@ -1763,10 +1763,10 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
             change_cursor = change_conn.cursor()
             
             create_query = '''CREATE TABLE IF NOT EXISTS USERS (first_name, last_name,
-                                    user_name, password,
-                                    security_answer, email,
-                                    phone_number, city,
-                                    birth_year, birth_month, birth_day,
+                                    user_name TEXT, password TEXT,
+                                    security_answer TEXT, email TEXT,
+                                    phone_number INT, city TEXT,
+                                    birth_year INT, birth_month TEXT, birth_day INT,
                                     UNIQUE(first_name, last_name,
                                         user_name, password,
                                         security_answer, email,
@@ -1967,14 +1967,73 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
                 self.close_exp_file_label.setVisible(True)  
                 
     def create_user_category_database(self):
-        if not os.path.exists(self.category_file):
-            Columns = ['category'] 
-            df = pd.DataFrame(columns = Columns)
+        cat_db_path = os.path.join(self.curr_dir, self.category_file)
+        conn = sql.connect(cat_db_path)
+        cursor = conn.cursor()
+        
+        create_table_query = '''CREATE TABLE IF NOT EXISTS CATEGORY (category TEXT,
+                                UNIQUE (category))'''
+                                
+        cursor.execute(create_table_query) 
+        conn.commit()       
+        
+        #add_item_query = '''INSERT OR IGNORE INTO CATEGORY (category)
+                            #VALUES (?)'''
+                            
+        #cursor.executemany(add_item_query, [(category, ) for category in self.category_combo]) 
+        #conn.commit() 
+        
+        conn.close()                                    
             
-            for category_item in self.category_combo:
-                df[len(df)] = category_item
-                
-            df.to_excel(self.category_file, index = False)                       
+        #for category_item in self.category_combo:
+            #df[len(df)] = category_item
+            
+    def add_item_category_combo(self):
+        self.create_user_category_database()
+        
+        cat_db_path = os.path.join(self.curr_dir, self.category_file)
+        conn = sql.connect(cat_db_path)
+        cursor = conn.cursor()
+        
+        select_query = '''SELECT category FROM CATEGORY'''
+        cursor.execute(select_query) 
+        rows = cursor.fetchall()
+        conn.commit()
+        
+        items_category = [row[0] for row in rows]
+        self.source_of_revenue_combo_box.addItems(items_category)
+
+    def add_text_to_db(self):  
+        self.create_user_category_database()
+        
+        cat_db_path = os.path.join(self.curr_dir, self.category_file)
+        conn = sql.connect(cat_db_path)
+        cursor = conn.cursor()
+        
+        text_category_xl = self.add_category_line.text()
+        check_query = '''SELECT *FROM CATEGORY WHERE category = ?'''
+        cursor.execute(check_query, (text_category_xl, )) 
+        resault = cursor.fetchall()
+        conn.commit()
+
+        if not resault[0] is None:
+            pass #self.category_label.show()
+        else:
+            if self.category_label.isVisible():
+                self.category_label.hide()
+            #try:
+            insert_query = '''INSERT OR IGNORE INTO CATEGORY (category)
+                                VALUES (?)'''
+        
+            cursor.execute(insert_query, (text_category_xl, )) 
+            conn.commit()
+            self.add_category_line.clear()
+
+            self.category_label_err.hide()
+            self.category_label.hide()
+            #except PermissionError :
+                #self.category_label_err.show()  
+        conn.close()                                    
                 
     def exit(self):
         self.close()
