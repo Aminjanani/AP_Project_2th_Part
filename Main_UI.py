@@ -173,7 +173,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.btn_category.clicked.connect(self.category)
         self.btn_search.clicked.connect(self.search)
         self.btn_report.clicked.connect(self.report)
-        #self.btn_settings.clicked.connect(self.settings)
+        self.btn_settings.clicked.connect(self.settings)
         self.btn_exit.clicked.connect(self.exit)
 
         self.setCentralWidget(self.mainWidget)
@@ -1489,11 +1489,11 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.password_line_edit2 = Validation.QLineEdit()
         self.password_line_edit2.setPlaceholderText('password')
         self.password_line_edit2.setStyleSheet(self.line_main_style)
-        self.password_line_edit2.setEchoMode(QLineEdit.EchoMode.Password)
+        self.password_line_edit2.setEchoMode(Validation.QLineEdit.EchoMode.Password)
         self.repeat_password_line_edit2 = Validation.QLineEdit()
         self.repeat_password_line_edit2.setPlaceholderText('repeat password')
         self.repeat_password_line_edit2.setStyleSheet(self.line_main_style)
-        self.repeat_password_line_edit2.setEchoMode(QLineEdit.EchoMode.Password)
+        self.repeat_password_line_edit2.setEchoMode(Validation.QLineEdit.EchoMode.Password)
         self.email_line_edit2 = Validation.QLineEdit()
         self.email_line_edit2.setPlaceholderText('email')
         self.email_line_edit2.setStyleSheet(self.line_main_style)
@@ -1637,7 +1637,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.delete_user.setStyleSheet(self.btn_main_style)
         self.leftLayout.addWidget(self.delete_user)
         
-        #self.change_info_btn.clicked.connect(self.change_information)
+        self.change_info_btn.clicked.connect(self.change_information)
         #self.delete_user.clicked.connect(self.Delete_User)
         
     def change_information(self) :
@@ -1753,7 +1753,36 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
             change_conn = sql.connect(self.users_file)
             change_cursor = change_conn.cursor()
             
-            change_info_query = '''UPDATE USER
+            create_query = '''CREATE TABLE IF NOT EXISTS USERS (first_name, last_name,
+                                    user_name, password,
+                                    security_answer, email,
+                                    phone_number, city,
+                                    birth_year, birth_month, birth_day,
+                                    UNIQUE(first_name, last_name,
+                                        user_name, password,
+                                        security_answer, email,
+                                        phone_number, city,
+                                        birth_year, birth_month, birth_day))'''
+                            
+            change_cursor.execute(create_query) 
+            change_conn.commit()                 
+                            
+            insert_query = '''INSERT OR IGNORE INTO USERS (
+                                    first_name, last_name,
+                                    user_name, password,
+                                    security_answer, email,
+                                    phone_number, city,
+                                    birth_year, birth_month, birth_day)
+                              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)      
+                              '''          
+            curr_info = [self.first_name, self.last_name, self.user_name,
+                        self.password, self.security_question, self.email, self.phone_number, self.city,
+                         self.birth_year, self.birth_mounth, self.birth_day]                      
+                              
+            change_cursor.execute(insert_query, tuple(curr_info)) 
+            change_conn.commit()                    
+            
+            change_info_query = '''UPDATE USERS
                                     SET first_name = ?, last_name = ?,
                                         user_name = ?, password = ?,
                                         security_answer = ?, email = ?,
@@ -1764,23 +1793,20 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
                                         user_name = ? AND password = ? AND
                                         security_answer = ? AND email = ? AND
                                         phone_number = ? AND city = ? AND
-                                        birth_year = ? AND birth_month = ? AND birth_day = ?'''
+                                        birth_year = ? AND birth_month = ? AND birth_day = ?'''                            
                                         
-            curr_info = [self.first_name, self.last_name,
-                        self.password, self.email,
-                        self.phone_number, self.city,
-                        self.birth_day, self.birth_mounth, self.birth_year] 
+ 
             
             new_info = [first_name, last_name, self.user_name,
                         password, self.security_question, email, 
                         phone_number, city, year, month, day]       
             
-            params = curr_info + new_info
-            change_cursor.execute(change_info_query, params) 
+            params = new_info + curr_info
+            change_cursor.execute(change_info_query, tuple(params)) 
             change_conn.commit()      
-            
-            change_conn.commit.close()  
-            change_cursor.close()           
+              
+            change_cursor.close()    
+            change_conn.close()       
             
             self.first_name = first_name
             self.last_name = last_name
@@ -1791,6 +1817,66 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
             self.birth_day = day
             self.birth_mounth = month
             self.birth_year = year    
+            
+    def Delete_User(self) :
+        delete_text = ""
+        delete_text = self.delete_info_line.text()
+        
+        if delete_text != "" :
+            if self.delete_err.isVisible() :
+                self.delete_err.setVisible(False) 
+             
+            revenue_file = self.user_name + f"_revenue.xlsx"
+            expense_file = self.user_name + f"_expense.xlsx"
+            category_file = self.user_name + f"_category.xlsx"   
+            if delete_text == "user" :
+                if os.path.exists(revenue_file) :
+                    os.remove(revenue_file)
+                    
+                if os.path.exists(expense_file) :
+                    os.remove(expense_file)   
+                    
+                if os.path.exists(category_file) :
+                    os.remove(category_file)
+                        
+                try :
+                    df = pd.DataFrame(self.users_file, dtype = str)
+                    
+                    masks = [(df['first_name'] == self.first_name), (df['last_name'] == self.last_name), 
+                            (df['user_name'] == self.user_name), (df['password'] == self.password), 
+                            (df['security_answer'] == self.security_question), (df['email'] == self.email), 
+                            (df['phone_number'] == self.phone_number), (df['city'] == self.city), 
+                            (df['birth_year'] == self.birth_year), (df['birth_month'] == self.birth_mounth), (df['birth_day'] == self.birth_day)]  
+                    
+                    combined_mask = masks[0]
+                    for mask in masks[1:] :
+                        combined_mask &= mask
+                        
+                    filtered_df = df[~combined_mask]
+                    filtered_df.to_excel(self.users_file, index = False)   
+                except :
+                    pass
+                
+            if delete_text == "transaction" :
+                if os.path.exists(revenue_file) :
+                    os.remove(revenue_file)
+                    
+                if os.path.exists(expense_file) :
+                    os.remove(expense_file)   
+                    
+                if os.path.exists(category_file) :
+                    os.remove(category_file)
+                        
+            if delete_text == "just revenue" :
+                if os.path.exists(revenue_file) :
+                    os.remove(revenue_file)
+                        
+            if delete_text == "just expense" :
+                if os.path.exists(expense_file) :
+                    os.remove(expense_file)       
+        else :
+            if not self.delete_err.isVisisble() :
+                self.delete_err.setVisible(True)         
         
     def create_user_revenue_databse(self): 
         conn =  sql.connect(self.revenue_file)   
