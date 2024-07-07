@@ -172,7 +172,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.btn_expense.clicked.connect(self.expense)
         self.btn_category.clicked.connect(self.category)
         self.btn_search.clicked.connect(self.search)
-        #self.btn_report.clicked.connect(self.report)
+        self.btn_report.clicked.connect(self.report)
         #self.btn_settings.clicked.connect(self.settings)
         self.btn_exit.clicked.connect(self.exit)
 
@@ -758,11 +758,11 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.search_view.setStyleSheet(self.view_style)
         self.btn_searching.clicked.connect(self.search_logic)
         
-    def find_month(self, month):
+    def find_month(self, month_num):
         itr = 1
-        for key, value in self.months:
-            if month.lower() == key.lower():
-                return itr
+        for key, value in self.months.items():
+            if itr == month_num:
+                return key.lower()
             else:
                 itr += 1
         return None        
@@ -824,7 +824,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
             
             now = Validation.datetime.now()
             Day = now.day
-            Month = now.month
+            Month = self.find_month(now.month)
             Year = now.year
             final_resault = ""    
             if rev_flag:
@@ -843,13 +843,13 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
                         query += " AND type LIKE '%' || ? || '%'"
                         filter_list.append(self.searched_word)      
                     if rev_day_flag:
-                        query += "AND day = ?"
+                        query += " AND day = ?"
                         filter_list.append(Day)
                     if rev_month_flag:
-                        query += "AND month = ?"
+                        query += " AND month = ?"
                         filter_list.append(Month)
                     if rev_year_flag:
-                        query += "AND year = ?" 
+                        query += " AND year = ?" 
                         filter_list.append(Year)  
                     if zero_hund_flag:
                         query += " AND 0 <= amount <= 100"   
@@ -859,10 +859,14 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
                         query += " AND amount > 1000"  
                         
                     cursor1.execute(query, tuple(filter_list))
+                    cursor1.commit()
                     total_rev = cursor1.fetchone()[0]
                     if total_rev is None:
                         total_rev = 0
-                    final_resault += f"Total Filtered Revenue : {total_rev}\n"              
+                    final_resault += f"Total Filtered Revenue : {total_rev}\n"  
+                
+                    cursor1.close()
+                    conn1.close()             
                 except:
                     pass     
             if exp_flag:  
@@ -881,13 +885,13 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
                         query += " AND type LIKE '%' || ? || '%'"
                         filter_list.append(self.searched_word)     
                     if exp_day_flag:
-                        query += "AND day = ?"
+                        query += " AND day = ?"
                         filter_list.append(Day)
                     if exp_month_flag:
-                        query += "AND month = ?"
+                        query += " AND month = ?"
                         filter_list.append(Month)
                     if exp_year_flag:
-                        query += "AND year = ?" 
+                        query += " AND year = ?" 
                         filter_list.append(Year)   
                     if zero_hund_flag:
                         query += " AND 0 <= amount <= 100"   
@@ -897,10 +901,14 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
                         query += " AND amount > 1000"  
                         
                     cursor2.execute(query, tuple(filter_list))
+                    cursor2.commit()
                     total_exp = cursor2.fetchone()[0]
                     if total_exp is None:
                         total_exp = 0
-                    final_resault += f"Total Filtered Expense : {total_exp}"  
+                    final_resault += f"Total Filtered Expense : {total_exp}" 
+                    
+                    cursor2.close()
+                    conn2.close()  
                 except:
                     pass
             self.search_view.setPlainText(final_resault)              
@@ -1079,9 +1087,13 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.leftLayout.addWidget(self.report_view)
         self.report_view.setStyleSheet(self.view_style)
         
-        #self.btn_report.clicked.connect(self.report_logic) 
+        self.btn_report.clicked.connect(self.report_logic) 
+        
+    def month_index(self, month):
+        Months = list(self.valid_mounths.keys())
+        return Months.index(month.lower()) + 1   
     
-    def report_logic(self) :
+    def report_logic(self):
         rep_from_day =  self.day_of_report_line.text() 
         rep_from_month =  self.month_of_report_line.text()  
         rep_from_year =  self.year_of_report_line.text()
@@ -1108,256 +1120,284 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
                         rep_from_day_val2, rep_from_month_val2, rep_from_year_val2, 
                         rep_until_day_val2, rep_until_month_val2, rep_until_year_val2]
         
-        current_date = datetime.now()
-        curr_day = str(current_date.day)
-        curr_month = current_date.month
-        curr_year = str(current_date.year)
+        current_date = Validation.datetime.now()
+        curr_day = current_date.day
+        curr_month = self.find_month(current_date.month)
+        curr_year = current_date.year
             
         Months = list(self.valid_mounths.keys())
         
         rev_flag = False
-        if self.report_revenue_check.isChecked() :
+        if self.report_revenue_check.isChecked():
             rev_flag = True
         exp_flag = False
-        if self.report_expense_check.isChecked() :
+        if self.report_expense_check.isChecked():
             exp_flag = True    
         day_report_flag = False
-        if self.day_report_check.isChecked() :
+        if self.day_report_check.isChecked():
             day_report_flag = True    
         month_report_flag = False
-        if self.month_report_check.isChecked() :
+        if self.month_report_check.isChecked():
             month_report_flag = True
         year_report_flag = False
         if self.year_report_check.isChecked() :
             year_report_flag = True
         zero_hund_flag = False
-        if self.report_0_100_dollar_check.isChecked() :
+        if self.report_0_100_dollar_check.isChecked():
             zero_hund_flag = True
         hund_thous_flag = False
-        if self.report_100_1000_dollar_check.isChecked() :
+        if self.report_100_1000_dollar_check.isChecked():
             hund_thous_flag = True
         more_flag = False
-        if self.report_more_than_1000_dollar_check.isChecked() :
+        if self.report_more_than_1000_dollar_check.isChecked():
             more_flag = True
         saving_flag = False
-        if self.saving_check.isChecked() :
+        if self.saving_check.isChecked():
             saving_flag = True
         cash_flag = False
-        if self.cash_check.isChecked() :
+        if self.cash_check.isChecked():
             cash_flag = True
         wage_flag = False
-        if self.wage_check.isChecked() :
+        if self.wage_check.isChecked():
             wage_flag = True 
         cheque_flag = False
-        if self.cheque_check.isChecked() :
+        if self.cheque_check.isChecked():
             cheque_flag = True    
         digital_flag = False
-        if self.digital_check :
+        if self.digital_check.isChecked():
             digital_flag = True    
             
-        final_ans = "" 
-        Months = list(self.valid_mounths.keys())
-        if rev_flag :   
-            if not os.path.exists(self.revenue_file) :
-                    Columns = ['amount', 'source', 'description', 'type', 'year', 'month', 'day'] 
-                    df = pd.DataFrame(columns = Columns)
-                    df.to_excel(self.revenue_file, index = False) 
-            try :        
-                df1 = pd.read_excel(self.revenue_file, dtype = str)
-                filtered_df1 = df1.copy()
+        final_ans = "NTH " 
+        if rev_flag:   
+            filters = []
+            filter_selected = False
+            conn1 = sql.connect(self.revenue_file)
+            cursor1 = conn1.cursor()
+            query = '''SELECT SUM(amount) FROM REVENUE WHERE 1 = 1'''
             
-                filtered_df1[['amount', 'year', 'day']] = filtered_df1[['amount', 'year', 'day']].astype(int)
-                total_rev = filtered_df1['amount'].sum()
-                rate = 100.00 / float(total_rev)
+            cursor1.execute(query)
+            total_rev = cursor1.fetchone()[0]
             
-                if False not in rep_val_list :
-                    filtered_df2 = filtered_df1.copy()
-                    filtered_df2['amount'] = filtered_df2['amount'].astype(int)
-                    filtered_df2 = filtered_df2[(filtered_df2['year'] >= int(rep_from_year)) & (filtered_df2['year'] <= int(rep_until_year))] 
-                    filtered_df2 = filtered_df2[(Months.index(filtered_df2['month'].lower()) + 1 >= int(rep_from_month)) & (Months.index(filtered_df2['month'].lower()) + 1 <= int(rep_until_month))]
-                    filtered_df2 = filtered_df2[(filtered_df2['day'] >= int(rep_from_day)) & (filtered_df2['day'] <= int(rep_until_day))] 
-                
-                if day_report_flag :
-                    filtered_df3 = filtered_df1.copy()
-                    filtered_df3['amount'] = filtered_df3['amount'].astype(int)
-                    filtered_df3 = filtered_df3[filtered_df3['day'] == curr_day]
-                    day_rev = filtered_df3['amount'].sum()
-                    final_ans += f"day revenue : {day_rev}\nday revenue ratio : %{day_rev * rate}\n" 
-                
-                if month_report_flag :
-                    filtered_df4 = filtered_df1.copy()
-                    filtered_df4['amount'] = filtered_df4['amount'].astype(int)
-                    filtered_df4 = filtered_df4[filtered_df4['month'] == curr_month]
-                    month_rev = filtered_df4['amount'].sum()
-                    final_ans += f"month revenue : {month_rev}\nmonth revenue ratio : %{month_rev * rate}\n"         
+            #try:   
+            query += " AND (1 = 1"     
+            if False not in rep_val_list:
+                rep_from_day = int(rep_from_day)
+                rep_until_day = int(rep_until_day)
+                rep_from_month = self.month_index(rep_from_month)
+                rep_until_month = self.month_index(rep_until_month) 
+                rep_from_year = int(rep_from_year)
+                rep_until_year = int(rep_until_year)
+                min_day, max_day = min(rep_from_day, rep_until_day), max(rep_from_day, rep_until_day) 
+                min_month, max_month = min(rep_from_month, rep_until_month), max(rep_from_month, rep_until_month) 
+                min_year, max_year = min(rep_from_year, rep_until_year), max(rep_from_year, rep_until_year) 
+                conn1.create_function('MONTH_INDEX', 1, self.month_index)
+                query += " AND day BETWEEN ? AND ?"
+                filters.append(min_day)
+                filters.append(max_day)
+                query += " AND MONTH_INDEX(month) BETWEEN ? AND ?"
+                filters.append(min_month)
+                filters.append(max_month)
+                query += " AND year BETWEEN ? AND ?"
+                filters.append(min_year)
+                filters.append(max_year)
             
-                if year_report_flag :
-                    filtered_df5 = filtered_df1.copy()
-                    filtered_df5['amount'] = filtered_df5['amount'].astype(int)
-                    filtered_df5 = filtered_df5[filtered_df5['year'] == curr_year]
-                    year_rev = filtered_df5['amount'].sum()
-                    final_ans += f"year revenue : {year_rev}\nyear revenue ratio : %{year_rev * rate}\n" 
-                
-                if zero_hund_flag :
-                    filtered_df6 = filtered_df6.copy()
-                    filtered_df6['amount'] = filtered_df6['amount'].astype(int)
-                    filtered_df6 = filtered_df6[(filtered_df6['amount'] >= 0) & (filtered_df6['amount'] <= 100)]
-                    zero_hund_rev = filtered_df6['amount'].sum()       
-                    final_ans += f"revenue between 0 and 100 : {zero_hund_rev}\nrevenue between 0 and 100 ratio : %{zero_hund_rev * rate}\n"
-               
-                if hund_thous_flag :
-                    filtered_df7 = filtered_df1.copy()
-                    filtered_df7['amount'] = filtered_df7['amount'].astype(int)
-                    filtered_df7 = filtered_df7[(filtered_df7['amount'] > 100) & (filtered_df7['amount'] <= 1000)]
-                    hund_thous_rev = filtered_df7['amount'].sum()       
-                    final_ans += f"revenue between 100 and 1000 : {hund_thous_rev}\nrevenue between 100 and 1000 ratio : %{hund_thous_rev * rate}\n" 
-               
-                if more_flag :
-                    filtered_df8 = filtered_df1.copy()
-                    filtered_df8['amount'] = filtered_df8['amount'].astype(int)
-                    filtered_df8 = filtered_df8[filtered_df8['amount'] > 1000]
-                    more_rev = filtered_df8['amount'].sum()       
-                    final_ans += f"revenue more than 1000 : {more_rev}\nrevenue more than 1000 ratio : %{more_rev * rate}\n" 
-               
-                if saving_flag :
-                    filtered_df9 = filtered_df1.copy()
-                    filtered_df9['amount'] = filtered_df9['amount'].astype(int)
-                    filtered_df9 = filtered_df9[filtered_df9['source'] == 'saving'] 
-                    saving_rev = filtered_df9['amount'].sum()  
-                    final_ans += f"savig revenue : {saving_rev}\nsaving revenue ratio : %{saving_rev * rate}\n"
-                
-                if cash_flag :
-                    filtered_df10 = filtered_df1.copy()
-                    filtered_df10['amount'] = filtered_df10['amount'].astype(int)
-                    filtered_df10 = filtered_df10[filtered_df10['type'] == 'Cash'] 
-                    cash_rev = filtered_df10['amount'].sum()  
-                    final_ans += f"cash revenue : {cash_rev}\ncash revenue ratio : %{cash_rev * rate}\n" 
-                
-                if wage_flag :
-                    filtered_df11 = filtered_df1.copy()
-                    filtered_df11['amount'] = filtered_df11['amount'].astype(int)
-                    filtered_df11 = filtered_df11[filtered_df11['source'] == 'wage'] 
-                    wage_rev = filtered_df11['amount'].sum()  
-                    final_ans += f"wage revenue : {wage_rev}\nwage revenue ratio : %{wage_rev * rate}\n" 
+            if False not in rep_val_list:  
+                filter_selected = True      
+                query += ") AND (1 = 0"
+            else:      
+                query += " OR 1 = 1) AND (1 = 0"
+            if day_report_flag and False in rep_val_list: 
+                filter_selected = True
+                query += " OR day = ?"
+                filters.append(curr_day)
                     
-                if cheque_flag :
-                    filtered_df12 = filtered_df1.copy()
-                    filtered_df12['amount'] = filtered_df12['amount'].astype(int)
-                    filtered_df12 = filtered_df12[filtered_df12['type'] == 'Cheque'] 
-                    cheque_rev = filtered_df12['amount'].sum()  
-                    final_ans += f"Cheque revenue : {cheque_rev}\nCheque revenue ratio : %{cheque_rev * rate}\n" 
-                
-                if digital_flag :
-                    filtered_df13 = filtered_df1.copy()
-                    filtered_df13['amount'] = filtered_df13['amount'].astype(int)
-                    filtered_df13 = filtered_df13[filtered_df13['type'] == 'Digital currency'] 
-                    digital_rev = filtered_df13['amount'].sum()  
-                    final_ans += f"Digital currency revenue : {digital_rev}\nDigital currency revenue ratio : %{digital_rev * rate}\n"     
-                
-                final_ans += f"total reached revenue : {total_rev}\n"  
-            except :
-                pass     
+            if month_report_flag and False in rep_val_list:
+                filter_selected = True
+                query += " OR month = ?"
+                filters.append(curr_month)       
             
-        if exp_flag :   
-            if not os.path.exists(self.expense_file) :
-                    Columns = ['amount', 'source', 'description', 'type', 'year', 'month', 'day'] 
-                    df2 = pd.DataFrame(columns = Columns)
-                    df2.to_excel(self.expense_file, index = False) 
-            try :        
-                df2 = pd.read_excel(self.expense_file, dtype = str)
-                filtered_df2 = df2.copy()
-            
-                filtered_df2[['amount', 'year', 'day']] = filtered_df2[['amount', 'year', 'day']].astype(int)
-                total_exp = filtered_df2['amount'].sum()
-                rate = 100.00 / float(total_exp)
-            
-                if False not in rep_val_list :
-                    filtered_df3 = filtered_df2.copy()
-                    filtered_df3['amount'] = filtered_df3['amount'].astype(int)
-                    filtered_df3 = filtered_df3[(filtered_df3['year'] >= int(rep_from_year)) & (filtered_df3['year'] <= int(rep_until_year))] 
-                    filtered_df3 = filtered_df3[(Months.index(filtered_df3['month'].lower()) + 1 >= int(rep_from_month)) & (Months.index(filtered_df3['month'].lower()) + 1 <= int(rep_until_month))]
-                    filtered_df3 = filtered_df3[(filtered_df3['day'] >= int(rep_from_day)) & (filtered_df3['day'] <= int(rep_until_day))] 
+            if year_report_flag and False in rep_val_list:
+                filter_selected = True
+                query += " OR year = ?"
+                filters.append(curr_year)
                 
-                if day_report_flag :
-                    filtered_df4 = filtered_df2.copy()
-                    filtered_df4['amount'] = filtered_df4['amount'].astype(int)
-                    filtered_df4 = filtered_df4[filtered_df4['day'] == curr_day]
-                    day_exp = filtered_df4['amount'].sum()
-                    final_ans += f"day expense : {day_exp}\nday expense ratio : %{day_exp * rate}\n" 
+            if True in [day_report_flag, month_report_flag, year_report_flag]:       
+                query += ") AND (1 = 0" 
+            else:
+                query += " OR 1 = 1) AND (1 = 0"
                 
-                if month_report_flag :
-                    filtered_df5 = filtered_df2.copy()
-                    filtered_df5['amount'] = filtered_df5['amount'].astype(int)
-                    filtered_df5 = filtered_df5[filtered_df5['month'] == curr_month]
-                    month_exp = filtered_df5['amount'].sum()
-                    final_ans += f"month expense : {month_exp}\nmonth expense ratio : %{month_exp * rate}\n"         
-            
-                if year_report_flag :
-                    filtered_df6 = filtered_df2.copy()
-                    filtered_df6['amount'] = filtered_df6['amount'].astype(int)
-                    filtered_df6 = filtered_df6[filtered_df6['year'] == curr_year]
-                    year_exp = filtered_df6['amount'].sum()
-                    final_ans += f"year expense : {year_exp}\nyear expense ratio : %{year_exp * rate}\n" 
-                
-                if zero_hund_flag :
-                    filtered_df7 = filtered_df2.copy()
-                    filtered_df7['amount'] = filtered_df7['amount'].astype(int)
-                    filtered_df7 = filtered_df7[(filtered_df7['amount'] >= 0) & (filtered_df7['amount'] <= 100)]
-                    zero_hund_exp = filtered_df7['amount'].sum()       
-                    final_ans += f"expense between 0 and 100 : {zero_hund_exp}\nexpense between 0 and 100 ratio : %{zero_hund_exp * rate}\n"
+            if zero_hund_flag:
+                query += " OR 0 <= amount <= 100"
                
-                if hund_thous_flag :
-                    filtered_df8 = filtered_df2.copy()
-                    filtered_df8['amount'] = filtered_df8['amount'].astype(int)
-                    filtered_df8 = filtered_df8[(filtered_df8['amount'] > 100) & (filtered_df8['amount'] <= 1000)]
-                    hund_thous_exp = filtered_df8['amount'].sum()       
-                    final_ans += f"expense between 100 and 1000 : {hund_thous_exp}\nexpense between 100 and 1000 ratio : %{hund_thous_exp}\n" 
-               
-                if more_flag :
-                    filtered_df9 = filtered_df2.copy()
-                    filtered_df9['amount'] = filtered_df9['amount'].astype(int)
-                    filtered_df9 = filtered_df9[filtered_df9['amount'] > 1000]
-                    more_exp = filtered_df9['amount'].sum()       
-                    final_ans += f"expense more than 1000 : {more_exp}\nexpense more than 1000 ratio : %{more_exp * rate}\n" 
-               
-                if saving_flag :
-                    filtered_df10 = filtered_df2.copy()
-                    filtered_df10['amount'] = filtered_df10['amount'].astype(int)
-                    filtered_df10 = filtered_df10[filtered_df10['source'] == 'saving'] 
-                    saving_exp = filtered_df10['amount'].sum()  
-                    final_ans += f"savig expense : {saving_exp}\nsaving expense ratio : %{saving_exp * rate}\n"
-                
-                if cash_flag :
-                    filtered_df11 = filtered_df2.copy()
-                    filtered_df11['amount'] = filtered_df11['amount'].astype(int)
-                    filtered_df11 = filtered_df11[filtered_df11['type'] == 'Cash'] 
-                    cash_exp = filtered_df11['amount'].sum()  
-                    final_ans += f"cash expense : {cash_exp}\ncash expense ratio : %{cash_exp * rate}\n" 
-                
-                if wage_flag :
-                    filtered_df12 = filtered_df2.copy()
-                    filtered_df12['amount'] = filtered_df12['amount'].astype(int)
-                    filtered_df12 = filtered_df12[filtered_df12['source'] == 'wage'] 
-                    wage_exp = filtered_df12['amount'].sum()  
-                    final_ans += f"wage expense : {wage_exp}\nwage expense ratio : %{wage_exp * rate}\n" 
+            if hund_thous_flag:
+                query += " OR 100 < amount <= 1000"
                     
-                if cheque_flag :
-                    filtered_df13 = filtered_df2.copy()
-                    filtered_df13['amount'] = filtered_df13['amount'].astype(int)
-                    filtered_df13 = filtered_df13[filtered_df13['type'] == 'Cheque'] 
-                    cheque_exp = filtered_df13['amount'].sum()  
-                    final_ans += f"wage expense : {cheque_exp}\nwage expense ratio : %{cheque_exp * rate}\n" 
+            if more_flag:
+                query += " OR amount > 1000"
                 
-                if digital_flag :
-                    filtered_df14 = filtered_df2.copy()
-                    filtered_df14['amount'] = filtered_df14['amount'].astype(int)
-                    filtered_df14 = filtered_df14[filtered_df14['type'] == 'Digital currency'] 
-                    digital_exp = filtered_df14['amount'].sum()  
-                    final_ans += f"wage expense : {digital_exp}\nwage expense ratio : %{digital_exp * rate}\n"     
+            if True in [zero_hund_flag, hund_thous_flag, more_flag]:
+                filter_selected = True        
+                query += ") AND (1 = 0" 
+            else:
+                query += " OR 1 = 1) AND (1 = 0"     
+               
+            if saving_flag:
+                query += " OR source = 'saving'"
+                    
+            if wage_flag:
+                query += " OR source = 'wage'" 
+                    
+            if True in [saving_flag, wage_flag]:      
+                filter_selected = True  
+                query += ") AND (1 = 0" 
+            else:
+                query += " OR 1 = 1) AND (1 = 0"      
                 
-                final_ans += f"total reached expense : {total_exp}\n" 
-            except :
-                pass
+            if cash_flag:
+                query += " OR type = 'Cash'"  
+                    
+            if cheque_flag:
+                query += " OR type = 'Cheque'"
+                
+            if digital_flag:
+                query += " OR type = 'Digital currency'"
+            
+            if True in [cash_flag, cheque_flag, digital_flag]:
+                filter_selected = True        
+                query += ")"
+            else:
+                query += " OR 1 = 1)"    
+            
+            total = None
+            if filter_selected:    
+                cursor1.execute(query, tuple(filters))
+                total = cursor1.fetchone()[0]    
+                conn1.commit()
+                    
+                if total is None:
+                    total = 0 
+            else:   
+                total = total_rev
+                    
+            final_ans += f"total filtered revenue : {total}\ntotal revenue : {total_rev}\n"  
+            conn1.close()
+            #except :
+                #pass     
+            
+        if exp_flag:   
+            filters = [] 
+            filter_selected = False
+            conn2 = sql.connect(self.expense_file)
+            cursor2 = conn2.cursor()
+            query = '''SELECT SUM(amount) FROM EXPENSE WHERE 1 = 1'''
+            #try:        
+            cursor2.execute(query)
+            total_rev = cursor2.fetchone()[0]
+               
+            query += " AND (1 = 1"     
+            if False not in rep_val_list:
+                rep_from_day = int(rep_from_day)
+                rep_until_day = int(rep_until_day)
+                rep_from_month = self.month_index(rep_from_month)
+                rep_until_month = self.month_index(rep_until_month) 
+                rep_from_year = int(rep_from_year)
+                rep_until_year = int(rep_until_year)
+                min_day, max_day = min(rep_from_day, rep_until_day), max(rep_from_day, rep_until_day) 
+                min_month, max_month = min(rep_from_month, rep_until_month), max(rep_from_month, rep_until_month) 
+                min_year, max_year = min(rep_from_year, rep_until_year), max(rep_from_year, rep_until_year) 
+                conn1.create_function('MONTH_INDEX', 1, self.month_index)
+                query += " AND day BETWEEN ? AND ?"
+                filters.append(min_day)
+                filters.append(max_day)
+                query += " AND MONTH_INDEX(month) BETWEEN ? AND ?"
+                filters.append(min_month)
+                filters.append(max_month)
+                query += " AND year BETWEEN ? AND ?"
+                filters.append(min_year)
+                filters.append(max_year)
+            
+            if False not in rep_val_list:  
+                filter_selected = True      
+                query += ") AND (1 = 0"
+            else:      
+                query += " OR 1 = 1) AND (1 = 0"
+            if day_report_flag and False in rep_val_list: 
+                filter_selected = True
+                query += " OR day = ?"
+                filters.append(curr_day)
+                    
+            if month_report_flag and False in rep_val_list:
+                filter_selected = True
+                query += " OR month = ?"
+                filters.append(curr_month)       
+            
+            if year_report_flag and False in rep_val_list:
+                filter_selected = True
+                query += " OR year = ?"
+                filters.append(curr_year)
+                
+            if True in [day_report_flag, month_report_flag, year_report_flag]:       
+                query += ") AND (1 = 0" 
+            else:
+                query += " OR 1 = 1) AND (1 = 0"
+                
+            if zero_hund_flag:
+                query += " OR 0 <= amount <= 100"
+               
+            if hund_thous_flag:
+                query += " OR 100 < amount <= 1000"
+                    
+            if more_flag:
+                query += " OR amount > 1000"
+                
+            if True in [zero_hund_flag, hund_thous_flag, more_flag]:
+                filter_selected = True        
+                query += ") AND (1 = 0" 
+            else:
+                query += " OR 1 = 1) AND (1 = 0"     
+               
+            if saving_flag:
+                query += " OR source = 'saving'"
+                    
+            if wage_flag:
+                query += " OR source = 'wage'" 
+                    
+            if True in [saving_flag, wage_flag]:      
+                filter_selected = True  
+                query += ") AND (1 = 0" 
+            else:
+                query += " OR 1 = 1) AND (1 = 0"      
+                
+            if cash_flag:
+                query += " OR type = 'Cash'"  
+                    
+            if cheque_flag:
+                query += " OR type = 'Cheque'"
+                
+            if digital_flag:
+                query += " OR type = 'Digital currency'"
+            
+            if True in [cash_flag, cheque_flag, digital_flag]:
+                filter_selected = True        
+                query += ")"
+            else:
+                query += " OR 1 = 1)"    
+            
+            total = None
+            if filter_selected:    
+                cursor2.execute(query, tuple(filters))
+                total = cursor2.fetchone()[0]    
+                conn2.commit()
+                    
+                if total is None:
+                    total = 0 
+            else:   
+                total = total_rev
+                    
+            final_ans += f"total filtered revenue : {total}\ntotal revenue : {total_rev}\n" 
+            conn2.close()
+            #except:
+                #pass
         self.report_view.setPlainText(final_ans)    
         
     def settings(self):
