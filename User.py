@@ -13,4 +13,4 @@ class user :
         self.birth_day = "" 
         self.birth_mounth = "" 
         self.birth_year = ""
-        self.users_file = "users_file"
+        self.users_file = "users_file.db"

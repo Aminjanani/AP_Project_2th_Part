@@ -1281,7 +1281,8 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
                     
             final_ans += f"Revenue :\ntotal filtered revenue : {total}  /  total revenue : {total_rev}  /  ratio : {(total / total_rev) * 100}\n" 
             
-            type_query = '''SELECT type, SUM(amount)
+            type_query = '''SELECT 
+                                type, SUM(amount)
                             FROM REVENUE
                             GROUP BY type
                             '''
@@ -1639,26 +1640,180 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         #self.change_info_btn.clicked.connect(self.change_information)
         #self.delete_user.clicked.connect(self.Delete_User)
         
+    def change_information(self) :
+        first_name = self.first_name_line_edit2.text()
+        last_name = self.last_name_line_edit2.text()
+        #user_name = self.user_name_line_edit2.text()
+        password = self.password_line_edit2.text()
+        re_password = self.repeat_password_line_edit2.text()
+        email = self.email_line_edit2.text()
+        phone_number = self.phone_number_line_edit2.text()
+        city = self.city_line_edit2.text()
+        day = self.day_line_edit2.text()
+        month = self.mounth_line_edit2.text()
+        year = self.year_line_edit2.text() 
+        
+        first_name_val = self.name_val(first_name)
+        last_name_val = self.name_val(last_name)
+        password_val = self.password_val(password)
+        re_password_val = (self.password_val(re_password) and password == re_password)
+        email_val = self.email_val(email)
+        phone_number_val = self.phone_number_val(phone_number)
+        city_val = (city != "")
+        day_val = self.day_val(day, month)
+        month_val = self.mounth_val(month)
+        year_val = self.year_val(year)
+        
+        info_val_list = [first_name_val, last_name_val, password_val, re_password_val, 
+                         email_val, phone_number_val, city_val, day_val, month_val, year_val]
+        
+        if False in info_val_list :
+            if not info_val_list[0] :
+                if not self.err_lab_firstname.isVisible() :
+                    self.err_lab_firstname.setVisible(True)
+            else :
+                if self.err_lab_firstname.isVisible() :
+                    self.err_lab_firstname.setVisible(False)
+            if not info_val_list[1] :
+                if not self.err_lab_lastname.isVisible() :
+                    self.err_lab_lastname.setVisible(True)
+            else :
+                if self.err_lab_lastname.isVisible() :
+                    self.err_lab_lastname.setVisible(False)
+            if not info_val_list[2] :
+                if not self.err_lab_password.isVisible() :
+                    self.err_lab_password.setVisible(True)
+            else :
+                if self.err_lab_password.isVisible() :
+                    self.err_lab_password.setVisible(False)
+            if not info_val_list[3] :
+                if not self.err_lab_repassword.isVisible() :
+                    self.err_lab_repassword.setVisible(True)
+            else :
+                if self.err_lab_repassword.isVisible() :
+                    self.err_lab_repassword.setVisible(False)
+            if not info_val_list[4] :
+                if not self.err_lab_email.isVisible() :
+                    self.err_lab_email.setVisible(True)
+            else :
+                if self.err_lab_email.isVisible() :
+                    self.err_lab_email.setVisible(False) 
+            if not info_val_list[5] :
+                if not self.err_lab_phone.isVisible() :
+                    self.err_lab_phone.setVisible(True)
+            else :
+                if self.err_lab_phone.isVisible() :
+                    self.err_lab_phone.setVisible(False)  
+            if not info_val_list[6] :
+                if not self.err_lab_city.isVisible() :
+                    self.err_lab_city.setVisible(True)
+            else :
+                if self.err_lab_city.isVisible() :
+                    self.err_lab_city.setVisible(False)
+            if not info_val_list[7] :
+                if not self.err_lab_day.isVisible() :
+                    self.err_lab_day.setVisible(True)
+            else :
+                if self.err_lab_day.isVisible() :
+                    self.err_lab_day.setVisible(False) 
+            if not info_val_list[8] :
+                if not self.err_lab_month.isVisible() :
+                    self.err_lab_month.setVisible(True)
+            else :
+                if self.err_lab_month.isVisible() :
+                    self.err_lab_month.setVisible(False) 
+            if not info_val_list[9] :
+                if not self.err_lab_year.isVisible() :
+                    self.err_lab_year.setVisible(True)
+            else :
+                if self.err_lab_year.isVisible() :
+                    self.err_lab_year.setVisible(False)                                                              
+        else :
+            if self.err_lab_firstname.isVisible() :
+                    self.err_lab_firstname.setVisible(False)
+            if self.err_lab_lastname.isVisible() :
+                    self.err_lab_lastname.setVisible(False)  
+            if self.err_lab_password.isVisible() :
+                    self.err_lab_password.setVisible(False)
+            if self.err_lab_repassword.isVisible() :
+                    self.err_lab_repassword.setVisible(False)  
+            if self.err_lab_email.isVisible() :
+                    self.err_lab_email.setVisible(False)  
+            if self.err_lab_phone.isVisible() :
+                    self.err_lab_phone.setVisible(False) 
+            if self.err_lab_city.isVisible() :
+                    self.err_lab_city.setVisible(False)
+            if self.err_lab_day.isVisible() :
+                    self.err_lab_day.setVisible(False) 
+            if self.err_lab_month.isVisible() :
+                    self.err_lab_month.setVisible(False)
+            if self.err_lab_year.isVisible() :
+                    self.err_lab_year.setVisible(False)                                                                   
+            
+            change_conn = sql.connect(self.users_file)
+            change_cursor = change_conn.cursor()
+            
+            change_info_query = '''UPDATE USER
+                                    SET first_name = ?, last_name = ?,
+                                        user_name = ?, password = ?,
+                                        security_answer = ?, email = ?,
+                                        phone_number = ?, city = ?,
+                                        birth_year = ?, birth_month = ?, birth_day = ?
+                                    WHERE 
+                                        first_name = ? AND last_name = ? AND
+                                        user_name = ? AND password = ? AND
+                                        security_answer = ? AND email = ? AND
+                                        phone_number = ? AND city = ? AND
+                                        birth_year = ? AND birth_month = ? AND birth_day = ?'''
+                                        
+            curr_info = [self.first_name, self.last_name,
+                        self.password, self.email,
+                        self.phone_number, self.city,
+                        self.birth_day, self.birth_mounth, self.birth_year] 
+            
+            new_info = [first_name, last_name, self.user_name,
+                        password, self.security_question, email, 
+                        phone_number, city, year, month, day]       
+            
+            params = curr_info + new_info
+            change_cursor.execute(change_info_query, params) 
+            change_conn.commit()      
+            
+            change_conn.commit.close()  
+            change_cursor.close()           
+            
+            self.first_name = first_name
+            self.last_name = last_name
+            self.password = password
+            self.email = email
+            self.phone_number = phone_number
+            self.city = city
+            self.birth_day = day
+            self.birth_mounth = month
+            self.birth_year = year    
+        
     def create_user_revenue_databse(self): 
         conn =  sql.connect(self.revenue_file)   
         cursor = conn.cursor()
         
         create_table_query = '''CREATE TABLE IF NOT EXISTS REVENUE (
-                                amount INT NOT NULL,
-                                source TEXT NOT NULL,
-                                description TEXT,
-                                type TEXT NOT NULL,
-                                year INT NOT NULL,
-                                month TEXT NOT NULL,
-                                day INT NULL, 
-                                UNIQUE(amount, source, 
-                                description, type, year, month, day))'''
+                                    amount INT NOT NULL,
+                                    source TEXT NOT NULL,
+                                    description TEXT,
+                                    type TEXT NOT NULL,
+                                    year INT NOT NULL,
+                                    month TEXT NOT NULL,
+                                    day INT NULL, 
+                                    UNIQUE(amount, source, 
+                                    description, type, year, month, day))'''
                           
         cursor.execute(create_table_query)
         conn.commit()
         
-        insert_query = '''INSERT OR IGNORE INTO REVENUE (amount, source, description, type, year, month, day)
-                          VALUES (?, ?, ?, ?, ?, ?, ?)'''                 
+        insert_query = '''INSERT OR IGNORE INTO REVENUE 
+                                (amount, source, description, type, year, month, day)
+                          VALUES 
+                                (?, ?, ?, ?, ?, ?, ?)'''                 
         
         try:       
             rev_info = (int(self.rev_amount), self.rev_source, self.rev_desc, 
@@ -1680,21 +1835,23 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         cursor = conn.cursor()
         
         create_table_query = '''CREATE TABLE IF NOT EXISTS EXPENSE (
-                                amount INT NOT NULL,
-                                source TEXT NOT NULL,
-                                description TEXT,
-                                type TEXT NOT NULL,
-                                year INT NOT NULL,
-                                month TEXT NOT NULL,
-                                day INT NULL, 
-                                UNIQUE(amount, source, 
-                                description, type, year, month, day))'''
+                                    amount INT NOT NULL,
+                                    source TEXT NOT NULL,
+                                    description TEXT,
+                                    type TEXT NOT NULL,
+                                    year INT NOT NULL,
+                                    month TEXT NOT NULL,
+                                    day INT NULL, 
+                                    UNIQUE(amount, source, 
+                                    description, type, year, month, day))'''
                           
         cursor.execute(create_table_query)
         conn.commit()
         
-        insert_query = '''INSERT OR IGNORE INTO EXPENSE (amount, source, description, type, year, month, day)
-                          VALUES (?, ?, ?, ?, ?, ?, ?)'''                 
+        insert_query = '''INSERT OR IGNORE INTO EXPENSE 
+                                (amount, source, description, type, year, month, day)
+                          VALUES 
+                                (?, ?, ?, ?, ?, ?, ?)'''                 
         
         try:       
             exp_info = (int(self.exp_amount), self.exp_source, self.exp_desc, 
