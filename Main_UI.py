@@ -41,6 +41,9 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         #self.category_file = self.user_name + f"_category.db"
         self.category_file = f"amin_category.db"
         self.curr_dir = os.path.dirname(os.path.abspath(__file__))
+        self.curr_info = [self.first_name, self.last_name, self.user_name,
+                          self.password, self.security_question, self.email, self.phone_number, self.city,
+                          self.birth_year, self.birth_mounth, self.birth_day]
         self.Main_window()
 
     def Main_window(self):
@@ -1642,7 +1645,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.leftLayout.addWidget(self.delete_user)
         
         self.change_info_btn.clicked.connect(self.change_information)
-        #self.delete_user.clicked.connect(self.Delete_User)
+        self.delete_user.clicked.connect(self.Delete_User)
         
     def change_information(self):
         first_name = self.first_name_line_edit2.text()
@@ -1756,7 +1759,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
             
             db_path = os.path.join(self.curr_dir, self.users_file)
             
-            change_conn = sql.connect(db_path )
+            change_conn = sql.connect(db_path)
             change_cursor = change_conn.cursor()
             
             create_query = '''CREATE TABLE IF NOT EXISTS USERS (first_name, last_name,
@@ -1781,11 +1784,11 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
                                     birth_year, birth_month, birth_day)
                               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)      
                               '''          
-            curr_info = [self.first_name, self.last_name, self.user_name,
-                        self.password, self.security_question, self.email, self.phone_number, self.city,
-                         self.birth_year, self.birth_mounth, self.birth_day]                      
+            #curr_info = [self.first_name, self.last_name, self.user_name,
+                         #self.password, self.security_question, self.email, self.phone_number, self.city,
+                         #self.birth_year, self.birth_mounth, self.birth_day]                      
                               
-            change_cursor.execute(insert_query, tuple(curr_info)) 
+            change_cursor.execute(insert_query, tuple(self.curr_info)) 
             change_conn.commit()                    
             
             change_info_query = '''UPDATE USERS
@@ -1801,13 +1804,11 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
                                         phone_number = ? AND city = ? AND
                                         birth_year = ? AND birth_month = ? AND birth_day = ?'''                            
                                         
- 
-            
             new_info = [first_name, last_name, self.user_name,
                         password, self.security_question, email, 
                         phone_number, city, year, month, day]       
             
-            params = new_info + curr_info
+            params = new_info + self.curr_info
             change_cursor.execute(change_info_query, tuple(params)) 
             change_conn.commit()      
               
@@ -1831,55 +1832,58 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         if delete_text != "":
             if self.delete_err.isVisible():
                 self.delete_err.setVisible(False) 
-             
-            revenue_file = self.user_name + f"_revenue.xlsx"
-            expense_file = self.user_name + f"_expense.xlsx"
-            category_file = self.user_name + f"_category.xlsx"   
-            if delete_text == "user" :
-                if os.path.exists(revenue_file) :
-                    os.remove(revenue_file)
-                    
-                if os.path.exists(expense_file) :
-                    os.remove(expense_file)   
-                    
-                if os.path.exists(category_file) :
-                    os.remove(category_file)
-                        
-                try :
-                    df = pd.DataFrame(self.users_file, dtype = str)
-                    
-                    masks = [(df['first_name'] == self.first_name), (df['last_name'] == self.last_name), 
-                            (df['user_name'] == self.user_name), (df['password'] == self.password), 
-                            (df['security_answer'] == self.security_question), (df['email'] == self.email), 
-                            (df['phone_number'] == self.phone_number), (df['city'] == self.city), 
-                            (df['birth_year'] == self.birth_year), (df['birth_month'] == self.birth_mounth), (df['birth_day'] == self.birth_day)]  
-                    
-                    combined_mask = masks[0]
-                    for mask in masks[1:] :
-                        combined_mask &= mask
-                        
-                    filtered_df = df[~combined_mask]
-                    filtered_df.to_excel(self.users_file, index = False)   
-                except :
-                    pass
                 
-            if delete_text == "transaction" :
-                if os.path.exists(revenue_file) :
-                    os.remove(revenue_file)
+            rev_db_path = os.path.join(self.curr_dir, self.revenue_file) 
+            exp_db_path = os.path.join(self.curr_dir, self.expense_file)
+            cat_db_path = os.path.join(self.curr_dir, self.category_file) 
+            user_db_path = os.path.join(self.curr_dir, self.users_file)
+            if delete_text == "user" :
+                if os.path.exists(rev_db_path) :
+                    os.remove(rev_db_path)
                     
-                if os.path.exists(expense_file) :
-                    os.remove(expense_file)   
+                if os.path.exists(exp_db_path) :
+                    os.remove(exp_db_path )   
                     
-                if os.path.exists(category_file) :
-                    os.remove(category_file)
+                if os.path.exists(cat_db_path) :
+                    os.remove(cat_db_path)
+                
+                if os.path.exists(user_db_path) :
+                    try :
+                        conn = sql.connect(user_db_path)
+                        cursor = conn.cursor()
                         
-            if delete_text == "just revenue" :
-                if os.path.exists(revenue_file) :
-                    os.remove(revenue_file)
+                        delete_query = '''DELETE FROM USERS WHERE 
+                                                first_name = ? AND last_name = ? AND
+                                                user_name = ? AND password = ? AND
+                                                security_answer = ? AND email = ? AND
+                                                phone_number = ? AND city = ? AND
+                                                birth_year = ? AND birth_month = ? AND birth_day = ?
+                                        ''' 
+                        cursor.execute(delete_query, self.curr_info)  
+                        conn.commit()
                         
-            if delete_text == "just expense" :
-                if os.path.exists(expense_file) :
-                    os.remove(expense_file)       
+                        cursor.close()      
+                        conn.close()         
+                    except :
+                        pass
+                
+            elif delete_text == "transaction" :
+                if os.path.exists(rev_db_path) :
+                    os.remove(rev_db_path)
+                    
+                if os.path.exists(exp_db_path) :
+                    os.remove(exp_db_path)   
+                    
+                if os.path.exists(cat_db_path) :
+                    os.remove(cat_db_path)
+                        
+            elif delete_text == "just revenue" :
+                if os.path.exists(rev_db_path) :
+                    os.remove(rev_db_path)
+                        
+            elif delete_text == "just expense" :
+                if os.path.exists(exp_db_path) :
+                    os.remove(exp_db_path)       
         else :
             if not self.delete_err.isVisisble() :
                 self.delete_err.setVisible(True)         
