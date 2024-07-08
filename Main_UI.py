@@ -832,13 +832,17 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
             Day = now.day
             Month = self.find_month(now.month)
             Year = now.year
-            final_resault = ""    
+            final_resault = "search resaults:\n"    
             if rev_flag:
                 try:  
                     filter_list = []  
-                    conn1 = sql.connect(self.revenue_file)
+                    rev_db_path = os.path.join(self.curr_dir, self.revenue_file)
+                    conn1 = sql.connect(rev_db_path)
                     cursor1 = conn1.cursor()
-                    query = '''SELECT SUM(amount) FROM REVENUE WHERE 1 = 1'''
+                    query = '''SELECT SUM(amount) as total_rev,
+                                    GROUP_CONCAT(DISTINCT source) as sources,
+                                    GROUP_CONCAT(DISTINCT type) as types
+                               FROM REVENUE WHERE 1 = 1'''
                     if rev_desc:
                         query += " AND description LIKE '%' || ? || '%'"
                         filter_list.append(self.searched_word)
@@ -858,18 +862,21 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
                         query += " AND year = ?" 
                         filter_list.append(Year)  
                     if zero_hund_flag:
-                        query += " AND 0 <= amount <= 100"   
+                        query += " AND amount BETWEEN 0 AND 100"
                     if hund_touse_flag:
-                        query += " AND 100 < amount <= 1000"
+                        query += " AND amount BETWEEN 100 AND 1000"
                     if more_flag:
                         query += " AND amount > 1000"  
                         
                     cursor1.execute(query, tuple(filter_list))
-                    cursor1.commit()
-                    total_rev = cursor1.fetchone()[0]
+                    conn1.commit()
+                    resaults = cursor1.fetchone()
+                    total_rev = resaults[0]
+                    sources = resaults[1]
+                    types = resaults[2]
                     if total_rev is None:
                         total_rev = 0
-                    final_resault += f"Total Filtered Revenue : {total_rev}\n"  
+                    final_resault += f"Revenue:\nTotal Filtered Revenue : {total_rev}\nSources: {sources}\nTypes: {types}\n"  
                 
                     cursor1.close()
                     conn1.close()             
@@ -878,9 +885,13 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
             if exp_flag:  
                 try:
                     filter_list = [] 
-                    conn2 = sql.connect(self.expense_file)
+                    exp_db_path = os.path.join(self.curr_dir, self.expense_file)
+                    conn2 = sql.connect(exp_db_path)
                     cursor2 = conn2.cursor()
-                    query = '''SELECT SUM(amount) FROM EXPENSE WHERE 1 = 1'''
+                    query = '''SELECT SUM(amount) as total_exp,
+                                    GROUP_CONCAT(DISTINCT source) as sources,
+                                    GROUP_CONCAT(DISTINCT type) as types
+                               FROM EXPENSE WHERE 1 = 1'''
                     if exp_desc:
                         query += " AND description LIKE '%' || ? || '%'"
                         filter_list.append(self.searched_word)
@@ -900,18 +911,21 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
                         query += " AND year = ?" 
                         filter_list.append(Year)   
                     if zero_hund_flag:
-                        query += " AND 0 <= amount <= 100"   
+                        query += " AND amount BETWEEN 0 AND 100"   
                     if hund_touse_flag:
-                        query += " AND 100 < amount <= 1000"
+                        query += " AND amount BETWEEN 100 AND 1000"
                     if more_flag:
                         query += " AND amount > 1000"  
                         
                     cursor2.execute(query, tuple(filter_list))
-                    cursor2.commit()
-                    total_exp = cursor2.fetchone()[0]
+                    conn2.commit()
+                    resaults = cursor2.fetchone()
+                    total_exp = resaults[0]
+                    sources = resaults[1]
+                    types = resaults[2]
                     if total_exp is None:
                         total_exp = 0
-                    final_resault += f"Total Filtered Expense : {total_exp}" 
+                    final_resault += f"Expense:\nTotal Filtered Expense : {total_exp}\nSources: {sources}\nTypes: {types}"  
                     
                     cursor2.close()
                     conn2.close()  
@@ -1983,22 +1997,15 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         
         add_item_query = '''INSERT OR IGNORE INTO CATEGORY (category)
                             VALUES (?)'''
-                            
-        #cursor.execute(add_item_query, [(category, ) for category in self.category_combo]) 
-        #conn.commit() 
+                             
         for category in self.category_combo:
             cursor.execute(add_item_query, (category, ))
             conn.commit()
             
         conn.close()                                    
             
-        #for category_item in self.category_combo:
-            #df[len(df)] = category_item
-            
     def add_item_category_combo(self):
         cat_db_path = os.path.join(self.curr_dir, self.category_file)
-        #if not os.path.exists(cat_db_path):       
-            #self.create_user_category_database()
         
         conn = sql.connect(cat_db_path)
         cursor = conn.cursor()
@@ -2027,23 +2034,23 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         resault = cursor.fetchall()
         conn.commit()
 
-        if not len(resault) == 0:
+        if resault:
             self.category_label.show()
         else:
             if self.category_label.isVisible():
                 self.category_label.hide()
-            #try:
-            insert_query = '''INSERT OR IGNORE INTO CATEGORY (category)
-                                VALUES (?)'''
+            try:
+                insert_query = '''INSERT OR IGNORE INTO CATEGORY (category)
+                                  VALUES (?)'''
         
-            cursor.execute(insert_query, (text_category_xl, )) 
-            conn.commit()
-            self.add_category_line.clear()
+                cursor.execute(insert_query, (text_category_xl, )) 
+                conn.commit()
+                self.add_category_line.clear()
 
-            self.category_label_err.hide()
-            self.category_label.hide()
-            #except PermissionError :
-                #self.category_label_err.show()  
+                self.category_label_err.hide()
+                self.category_label.hide()
+            except PermissionError :
+                self.category_label_err.show()  
         conn.close()                                    
                 
     def exit(self):
