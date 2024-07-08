@@ -553,6 +553,7 @@ class signup_login(MainUI) :
             self.log_user2_line_edit.hide()
             self.log_password2_line_edit.hide()
             self.log_sub2_btn.hide()
+            
     def find_user_pass(self, user_name, security_answer):
         conn = sqlite3.connect('usersApp.db')
         cursor = conn.cursor()
@@ -624,7 +625,7 @@ class signup_login(MainUI) :
 
             #create table if not exist user
             cursor.execute('''
-                CREATE TABLE IF NOT EXISTS users (
+                CREATE TABLE IF NOT EXISTS Users (
                     first_name TEXT,
                     last_name TEXT,
                     user_name TEXT PRIMARY KEY,
@@ -643,7 +644,7 @@ class signup_login(MainUI) :
                         self.phone_number, self.city, self.birth_year, self.birth_mounth, self.birth_day)
 
             
-            cursor.execute('SELECT * FROM users WHERE user_name = ?', (self.user_name,))
+            cursor.execute('SELECT * FROM Users WHERE user_name = ?', (self.user_name,))
             existing_user = cursor.fetchone()
             if existing_user:
                 flag = True
@@ -652,7 +653,7 @@ class signup_login(MainUI) :
 
             if not flag:
                 cursor.execute('''
-                    INSERT INTO users (first_name, last_name, user_name, password, security_answer, email, phone_number, city, birth_year, birth_month, birth_day)
+                    INSERT INTO Users (first_name, last_name, user_name, password, security_answer, email, phone_number, city, birth_year, birth_month, birth_day)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', user_info)
                 conn.commit()
@@ -839,7 +840,7 @@ class signup_login(MainUI) :
 
             cursor.execute('''
                 SELECT first_name, last_name, user_name, password, security_answer, email, phone_number, city, birth_year, birth_month, birth_day
-                FROM users
+                FROM Users
                 WHERE user_name = ? AND password = ?
             ''', (user_name, password))
 
