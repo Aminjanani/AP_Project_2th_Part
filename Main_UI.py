@@ -2,6 +2,8 @@ from User import user
 import Validation
 import sqlite3 as sql
 import os
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 # This class contains the main menu of the app, including the revenue, expence, category, search, report and setting pages as well as exit button.
 class MainUI(Validation.QMainWindow, user, Validation.check_validation):
@@ -34,12 +36,12 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.exp_desc = ""
         self.exp_type = ""
         self.searched_word = ""
-        #self.revenue_file = self.user_name + f"_revenue.db"
-        self.revenue_file = f"amin_revenue.db"
-        #self.expense_file = self.user_name + f"_expense.db"
-        self.expense_file = f"amin_expense.db"
-        #self.category_file = self.user_name + f"_category.db"
-        self.category_file = f"amin_category.db"
+        self.revenue_file = self.user_name + f"_revenue.db"
+        #self.revenue_file = f"amin_revenue.db"
+        self.expense_file = self.user_name + f"_expense.db"
+        #self.expense_file = f"amin_expense.db"
+        self.category_file = self.user_name + f"_category.db"
+        #self.category_file = f"amin_category.db"
         self.curr_dir = os.path.dirname(os.path.abspath(__file__))
         self.curr_info = [self.first_name, self.last_name, self.user_name,
                           self.password, self.security_question, self.email, self.phone_number, self.city,
@@ -63,6 +65,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.hlayout5 = Validation.QHBoxLayout(self.leftWidget)
         self.hlayout6 = Validation.QHBoxLayout(self.leftWidget)
         self.hlayout7 = Validation.QHBoxLayout(self.leftWidget)
+        self.hlayout8 = Validation.QHBoxLayout(self.leftWidget)
 
         self.leftLayout.addLayout(self.hlayout)
         self.leftLayout.addLayout(self.hlayout2)
@@ -202,6 +205,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.clear_layout(self.hlayout5)
         self.clear_layout(self.hlayout6)
         self.clear_layout(self.hlayout7)
+        self.clear_layout(self.hlayout8)
 
         self.amount_of_revenue_line = Validation.QLineEdit()
         self.amount_of_revenue_label = Validation.QLabel()
@@ -435,6 +439,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.clear_layout(self.hlayout5)
         self.clear_layout(self.hlayout6)
         self.clear_layout(self.hlayout7)
+        self.clear_layout(self.hlayout8)
 
         self.amount_of_expense_line = Validation.QLineEdit()
         self.amount_of_expense_line.setPlaceholderText("Amount Of Expense")
@@ -657,6 +662,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.clear_layout(self.hlayout5)
         self.clear_layout(self.hlayout6)
         self.clear_layout(self.hlayout7)
+        self.clear_layout(self.hlayout8)
 
         self.add_category_line = Validation.QLineEdit()
         self.add_category_line.setPlaceholderText("Category")
@@ -693,6 +699,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.clear_layout(self.hlayout5)
         self.clear_layout(self.hlayout6)
         self.clear_layout(self.hlayout7)
+        self.clear_layout(self.hlayout8)
 
         self.leftLayout.addLayout(self.hlayout)
         self.search_line = Validation.QLineEdit()
@@ -945,6 +952,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.clear_layout(self.hlayout5)
         self.clear_layout(self.hlayout6)
         self.clear_layout(self.hlayout7)
+        self.clear_layout(self.hlayout8)
 
         self.year_of_report_combo_box = Validation.QComboBox()
         self.year_of_report_combo_box.setStyleSheet(self.combo_main_style)
@@ -1185,7 +1193,9 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
             cheque_flag = True    
         digital_flag = False
         if self.digital_check.isChecked():
-            digital_flag = True    
+            digital_flag = True  
+            
+        #fig , (ax1, ax2) = plt.subplots(1, 2, figsize = (5, 5))      
             
         final_ans = f"Report :\n" 
         if rev_flag:   
@@ -1199,145 +1209,151 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
             cursor1.execute(query)
             total_rev = cursor1.fetchone()[0]
             
-            #try:   
-            query += " AND (1 = 1"     
-            if False not in rep_val_list:
-                rep_from_day = int(rep_from_day)
-                rep_until_day = int(rep_until_day)
-                rep_from_month = self.month_index(rep_from_month)
-                rep_until_month = self.month_index(rep_until_month) 
-                rep_from_year = int(rep_from_year)
-                rep_until_year = int(rep_until_year)
-                min_day, max_day = min(rep_from_day, rep_until_day), max(rep_from_day, rep_until_day) 
-                min_month, max_month = min(rep_from_month, rep_until_month), max(rep_from_month, rep_until_month) 
-                min_year, max_year = min(rep_from_year, rep_until_year), max(rep_from_year, rep_until_year) 
-                conn1.create_function('MONTH_INDEX', 1, self.month_index)
-                query += " AND day BETWEEN ? AND ?"
-                filters.append(min_day)
-                filters.append(max_day)
-                query += " AND MONTH_INDEX(month) BETWEEN ? AND ?"
-                filters.append(min_month)
-                filters.append(max_month)
-                query += " AND year BETWEEN ? AND ?"
-                filters.append(min_year)
-                filters.append(max_year)
+            try:   
+                query += " AND (1 = 1"     
+                if False not in rep_val_list:
+                    rep_from_day = int(rep_from_day)
+                    rep_until_day = int(rep_until_day)
+                    rep_from_month = self.month_index(rep_from_month)
+                    rep_until_month = self.month_index(rep_until_month) 
+                    rep_from_year = int(rep_from_year)
+                    rep_until_year = int(rep_until_year)
+                    min_day, max_day = min(rep_from_day, rep_until_day), max(rep_from_day, rep_until_day) 
+                    min_month, max_month = min(rep_from_month, rep_until_month), max(rep_from_month, rep_until_month) 
+                    min_year, max_year = min(rep_from_year, rep_until_year), max(rep_from_year, rep_until_year) 
+                    conn1.create_function('MONTH_INDEX', 1, self.month_index)
+                    query += " AND day BETWEEN ? AND ?"
+                    filters.append(min_day)
+                    filters.append(max_day)
+                    query += " AND MONTH_INDEX(month) BETWEEN ? AND ?"
+                    filters.append(min_month)
+                    filters.append(max_month)
+                    query += " AND year BETWEEN ? AND ?"
+                    filters.append(min_year)
+                    filters.append(max_year)
             
-            if False not in rep_val_list:  
-                filter_selected = True      
-                query += ") AND (1 = 0"
-            else:      
-                query += " OR 1 = 1) AND (1 = 0"
-            if day_report_flag and False in rep_val_list: 
-                filter_selected = True
-                query += " OR day = ?"
-                filters.append(curr_day)
+                if False not in rep_val_list:  
+                    filter_selected = True      
+                    query += ") AND (1 = 0"
+                else:      
+                    query += " OR 1 = 1) AND (1 = 0"
+                if day_report_flag and False in rep_val_list: 
+                    filter_selected = True
+                    query += " OR day = ?"
+                    filters.append(curr_day)
                     
-            if month_report_flag and False in rep_val_list:
-                filter_selected = True
-                query += " OR month = ?"
-                filters.append(curr_month)       
+                if month_report_flag and False in rep_val_list:
+                    filter_selected = True
+                    query += " OR month = ?"
+                    filters.append(curr_month)       
             
-            if year_report_flag and False in rep_val_list:
-                filter_selected = True
-                query += " OR year = ?"
-                filters.append(curr_year)
+                if year_report_flag and False in rep_val_list:
+                    filter_selected = True
+                    query += " OR year = ?"
+                    filters.append(curr_year)
                 
-            if True in [day_report_flag, month_report_flag, year_report_flag]:       
-                query += ") AND (1 = 0" 
-            else:
-                query += " OR 1 = 1) AND (1 = 0"
+                if True in [day_report_flag, month_report_flag, year_report_flag]:       
+                    query += ") AND (1 = 0" 
+                else:
+                    query += " OR 1 = 1) AND (1 = 0"
                 
-            if zero_hund_flag:
-                query += " OR amount BETWEEN 0 AND 100"
+                if zero_hund_flag:
+                    query += " OR amount BETWEEN 0 AND 100"
                
-            if hund_thous_flag:
-                query += " OR amount BETWEEN 100 AND 1000"
+                if hund_thous_flag:
+                    query += " OR amount BETWEEN 100 AND 1000"
                     
-            if more_flag:
-                query += " OR amount > 1000"
+                if more_flag:
+                    query += " OR amount > 1000"
                 
-            if True in [zero_hund_flag, hund_thous_flag, more_flag]:
-                filter_selected = True        
-                query += ") AND (1 = 0" 
-            else:
-                query += " OR 1 = 1) AND (1 = 0"     
+                if True in [zero_hund_flag, hund_thous_flag, more_flag]:
+                    filter_selected = True        
+                    query += ") AND (1 = 0" 
+                else:
+                    query += " OR 1 = 1) AND (1 = 0"     
                
-            if saving_flag:
-                query += " OR source = 'saving'"
+                if saving_flag:
+                    query += " OR source = 'saving'"
                     
-            if wage_flag:
-                query += " OR source = 'wage'" 
+                if wage_flag:
+                    query += " OR source = 'wage'" 
                     
-            if True in [saving_flag, wage_flag]:      
-                filter_selected = True  
-                query += ") AND (1 = 0" 
-            else:
-                query += " OR 1 = 1) AND (1 = 0"      
+                if True in [saving_flag, wage_flag]:      
+                    filter_selected = True  
+                    query += ") AND (1 = 0" 
+                else:
+                    query += " OR 1 = 1) AND (1 = 0"      
                 
-            if cash_flag:
-                query += " OR type = 'Cash'"  
+                if cash_flag:
+                    query += " OR type = 'Cash'"  
                     
-            if cheque_flag:
-                query += " OR type = 'Cheque'"
+                if cheque_flag:
+                    query += " OR type = 'Cheque'"
                 
-            if digital_flag:
-                query += " OR type = 'Digital currency'"
+                if digital_flag:
+                    query += " OR type = 'Digital currency'"
+
+                if True in [cash_flag, cheque_flag, digital_flag]:
+                    filter_selected = True        
+                    query += ")"
+                else:
+                    query += " OR 1 = 1)"    
             
-            if True in [cash_flag, cheque_flag, digital_flag]:
-                filter_selected = True        
-                query += ")"
-            else:
-                query += " OR 1 = 1)"    
-            
-            total = None
-            if filter_selected:    
-                cursor1.execute(query, tuple(filters))
-                total = cursor1.fetchone()[0]    
-                conn1.commit()
+                total = None
+                if filter_selected:    
+                    cursor1.execute(query, tuple(filters))
+                    total = cursor1.fetchone()[0]    
+                    conn1.commit()
                     
                 if total is None:
                     total = 0 
-            else:   
-                total = total_rev
+                else:   
+                    total = total_rev
                     
-            final_ans += f"Revenue :\ntotal filtered revenue : {total}  /  total revenue : {total_rev}  /  ratio : {(total / total_rev) * 100}\n" 
+                final_ans += f"Revenue:\nTotal filtered revenue: {total} / total revenue: {total_rev}  /  ratio: {(total / total_rev) * 100}\n" 
             
-            type_query = '''SELECT 
-                                type, SUM(amount)
-                            FROM REVENUE
-                            GROUP BY type
-                            '''
-            cursor1.execute(type_query)   
-            type_rep = cursor1.fetchall()
-            conn1.commit() 
+                type_query = '''SELECT 
+                                    type, SUM(amount)
+                                FROM REVENUE
+                                GROUP BY type
+                                '''
+                cursor1.execute(type_query)   
+                type_rep = cursor1.fetchall()
+                conn1.commit() 
             
-            rev_labels = []
-            rev_sizes = []
-            for row in type_rep:
-                rev_labels.append(row[0])
-                rev_sizes.append(row[1])
-                final_ans += f"type: {row[0]} / amount of type: {row[1]} / ratio to total: %{(row[1] / total_rev) * 100}\n" 
-                final_ans += f"ratio to fitered amount(filterd_amount/type_amount): %{(total / row[1]) * 100}\n"
+                rev_labels = []
+                rev_sizes = []
+                for row in type_rep:
+                    rev_labels.append(row[0])
+                    rev_sizes.append(int(row[1]))
+                    final_ans += f"Type: {row[0]} / amount of type: {row[1]} / ratio to total: %{(row[1] / total_rev) * 100}\n" 
+                    final_ans += f"Ratio to fitered amount(filterd_amount/type_amount): %{(total / row[1]) * 100}\n"
                 
-            source_query = '''SELECT source, SUM(amount)
-                              FROM REVENUE
-                              GROUP BY source
-                            '''
-            cursor1.execute(source_query)   
-            source_rep = cursor1.fetchall()
-            conn1.commit() 
+                #ax1.pie(rev_sizes, labels = rev_labels, autopct = '%1.1f%%')
+                #ax1.set_title('Type')    
+                
+                source_query =  '''SELECT source, SUM(amount)
+                                    FROM REVENUE
+                                    GROUP BY source
+                                '''
+                cursor1.execute(source_query)   
+                source_rep = cursor1.fetchall()
+                conn1.commit()
             
-            rev_source_labels = []
-            rev_source_sizes = []
-            for row in source_rep:
-                rev_source_labels.append(row[0])
-                rev_source_sizes.append(row[1])
-                final_ans += f"source : {row[0]} / amount of source : {row[1]} / ratio : %{(row[1] / total_rev) * 100}" 
-                final_ans += f"ratio to fitered amount(filterd_amount/source_amount): %{(total / row[1]) * 100}\n"     
+                rev_source_labels = []
+                rev_source_sizes = []
+                for row in source_rep:
+                    rev_source_labels.append(row[0])
+                    rev_source_sizes.append(int(row[1]))
+                    final_ans += f"Source : {row[0]} / amount of source : {row[1]} / ratio : %{(row[1] / total_rev) * 100}" 
+                    final_ans += f"Ratio to fitered amount(filterd_amount/source_amount): %{(total / row[1]) * 100}\n"  
+                
+                #ax2.pie(rev_source_sizes, labels = rev_source_labels, autopct = '%1.1f%%')
+                #ax2.set_title('Source')           
              
-            conn1.close()
-            #except :
-                #pass     
+                conn1.close()
+            except:
+                pass    
             
         if exp_flag:   
             filters = [] 
@@ -1346,148 +1362,151 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
             conn2 = sql.connect(db_path)
             cursor2 = conn2.cursor()
             query = '''SELECT SUM(amount) FROM EXPENSE WHERE 1 = 1'''
-            #try:        
-            cursor2.execute(query)
-            total_exp = cursor2.fetchone()[0]
+            try:        
+                cursor2.execute(query)
+                total_exp = cursor2.fetchone()[0]
                
-            query += " AND (1 = 1"     
-            if False not in rep_val_list:
-                rep_from_day = int(rep_from_day)
-                rep_until_day = int(rep_until_day)
-                rep_from_month = self.month_index(rep_from_month)
-                rep_until_month = self.month_index(rep_until_month) 
-                rep_from_year = int(rep_from_year)
-                rep_until_year = int(rep_until_year)
-                min_day, max_day = min(rep_from_day, rep_until_day), max(rep_from_day, rep_until_day) 
-                min_month, max_month = min(rep_from_month, rep_until_month), max(rep_from_month, rep_until_month) 
-                min_year, max_year = min(rep_from_year, rep_until_year), max(rep_from_year, rep_until_year) 
-                conn2.create_function('MONTH_INDEX', 1, self.month_index)
-                query += " AND day BETWEEN ? AND ?"
-                filters.append(min_day)
-                filters.append(max_day)
-                query += " AND MONTH_INDEX(month) BETWEEN ? AND ?"
-                filters.append(min_month)
-                filters.append(max_month)
-                query += " AND year BETWEEN ? AND ?"
-                filters.append(min_year)
-                filters.append(max_year)
+                query += " AND (1 = 1"     
+                if False not in rep_val_list:
+                    rep_from_day = int(rep_from_day)
+                    rep_until_day = int(rep_until_day)
+                    rep_from_month = self.month_index(rep_from_month)
+                    rep_until_month = self.month_index(rep_until_month) 
+                    rep_from_year = int(rep_from_year)
+                    rep_until_year = int(rep_until_year)
+                    min_day, max_day = min(rep_from_day, rep_until_day), max(rep_from_day, rep_until_day) 
+                    min_month, max_month = min(rep_from_month, rep_until_month), max(rep_from_month, rep_until_month) 
+                    min_year, max_year = min(rep_from_year, rep_until_year), max(rep_from_year, rep_until_year) 
+                    conn2.create_function('MONTH_INDEX', 1, self.month_index)
+                    query += " AND day BETWEEN ? AND ?"
+                    filters.append(min_day)
+                    filters.append(max_day)
+                    query += " AND MONTH_INDEX(month) BETWEEN ? AND ?"
+                    filters.append(min_month)
+                    filters.append(max_month)
+                    query += " AND year BETWEEN ? AND ?"
+                    filters.append(min_year)
+                    filters.append(max_year)
             
-            if False not in rep_val_list:  
-                filter_selected = True      
-                query += ") AND (1 = 0"
-            else:      
-                query += " OR 1 = 1) AND (1 = 0"
-            if day_report_flag and False in rep_val_list: 
-                filter_selected = True
-                query += " OR day = ?"
-                filters.append(curr_day)
+                if False not in rep_val_list:  
+                    filter_selected = True      
+                    query += ") AND (1 = 0"
+                else:      
+                    query += " OR 1 = 1) AND (1 = 0"
+                if day_report_flag and False in rep_val_list: 
+                    filter_selected = True
+                    query += " OR day = ?"
+                    filters.append(curr_day)
                     
-            if month_report_flag and False in rep_val_list:
-                filter_selected = True
-                query += " OR month = ?"
-                filters.append(curr_month)       
+                if month_report_flag and False in rep_val_list:
+                    filter_selected = True
+                    query += " OR month = ?"
+                    filters.append(curr_month)       
             
-            if year_report_flag and False in rep_val_list:
-                filter_selected = True
-                query += " OR year = ?"
-                filters.append(curr_year)
+                if year_report_flag and False in rep_val_list:
+                    filter_selected = True
+                    query += " OR year = ?"
+                    filters.append(curr_year)
                 
-            if True in [day_report_flag, month_report_flag, year_report_flag]:       
-                query += ") AND (1 = 0" 
-            else:
-                query += " OR 1 = 1) AND (1 = 0"
+                if True in [day_report_flag, month_report_flag, year_report_flag]:       
+                    query += ") AND (1 = 0" 
+                else:
+                    query += " OR 1 = 1) AND (1 = 0"
                 
-            if zero_hund_flag:
-                query += " OR amount BETWEEN 0 AND 100"
+                if zero_hund_flag:
+                    query += " OR amount BETWEEN 0 AND 100"
                
-            if hund_thous_flag:
-                query += " OR amount BETWEEN 100 AND 1000"
+                if hund_thous_flag:
+                    query += " OR amount BETWEEN 100 AND 1000"
                     
-            if more_flag:
-                query += " OR amount > 1000"
+                if more_flag:
+                    query += " OR amount > 1000"
                 
-            if True in [zero_hund_flag, hund_thous_flag, more_flag]:
-                filter_selected = True        
-                query += ") AND (1 = 0" 
-            else:
-                query += " OR 1 = 1) AND (1 = 0"     
+                if True in [zero_hund_flag, hund_thous_flag, more_flag]:
+                    ilter_selected = True        
+                    query += ") AND (1 = 0" 
+                else:
+                    query += " OR 1 = 1) AND (1 = 0"     
                
-            if saving_flag:
-                query += " OR source = 'saving'"
+                if saving_flag:
+                    query += " OR source = 'saving'"
                     
-            if wage_flag:
-                query += " OR source = 'wage'" 
+                if wage_flag:
+                    query += " OR source = 'wage'" 
                     
-            if True in [saving_flag, wage_flag]:      
-                filter_selected = True  
-                query += ") AND (1 = 0" 
-            else:
-                query += " OR 1 = 1) AND (1 = 0"      
+                if True in [saving_flag, wage_flag]:      
+                    filter_selected = True  
+                    query += ") AND (1 = 0" 
+                else:
+                    query += " OR 1 = 1) AND (1 = 0"      
                 
-            if cash_flag:
-                query += " OR type = 'Cash'"  
+                if cash_flag:
+                    query += " OR type = 'Cash'"  
                     
-            if cheque_flag:
-                query += " OR type = 'Cheque'"
+                if cheque_flag:
+                    query += " OR type = 'Cheque'"
                 
-            if digital_flag:
-                query += " OR type = 'Digital currency'"
+                if digital_flag:
+                    query += " OR type = 'Digital currency'"
             
-            if True in [cash_flag, cheque_flag, digital_flag]:
-                filter_selected = True        
-                query += ")"
-            else:
-                query += " OR 1 = 1)"    
+                if True in [cash_flag, cheque_flag, digital_flag]:
+                    filter_selected = True        
+                    query += ")"
+                else:
+                    query += " OR 1 = 1)"    
             
-            total = None
-            if filter_selected:    
-                cursor2.execute(query, tuple(filters))
-                total = cursor2.fetchone()[0]    
-                conn2.commit()
+                total = None
+                if filter_selected:    
+                    cursor2.execute(query, tuple(filters))
+                    total = cursor2.fetchone()[0]    
+                    conn2.commit()
                     
                 if total is None:
                     total = 0 
-            else:   
-                total = total_exp
+                else:   
+                    total = total_exp
                     
-            final_ans += f"Expense :\ntotal filtered expense : {total} / total expense : {total_exp} / ratio : %{(total / total_exp) * 100}\n"
+                final_ans += f"Expense:\nTotal filtered expense: {total} / total expense : {total_exp} / ratio: %{(total / total_exp) * 100}\n"
             
-            type_query = '''SELECT type, SUM(amount)
-                            FROM EXPENSE
-                            GROUP BY type
-                            '''
-            cursor2.execute(type_query)   
-            type_rep = cursor2.fetchall()
-            conn2.commit() 
+                type_query = '''SELECT type, SUM(amount)
+                                FROM EXPENSE
+                                GROUP BY type
+                                '''
+                cursor2.execute(type_query)   
+                type_rep = cursor2.fetchall()
+                conn2.commit() 
             
-            exp_type_labels = []
-            exp_type_sizes = []
-            for row in type_rep:
-                exp_type_labels.append(row[0])
-                exp_type_sizes.append(row[1])
-                final_ans += f"type : {row[0]} / amount of type : {row[1]} / ratio : %{(row[1] / total_exp) * 100}" 
-                final_ans += f"ratio to fitered amount(filterd_amount/type_amount): %{(total / row[1]) * 100}\n"  
+                exp_type_labels = []
+                exp_type_sizes = []
+                for row in type_rep:
+                    exp_type_labels.append(row[0])
+                    exp_type_sizes.append(row[1])
+                    final_ans += f"Type : {row[0]} / amount of type : {row[1]} / ratio : %{(row[1] / total_exp) * 100}" 
+                    final_ans += f"Ratio to fitered amount(filterd_amount/type_amount): %{(total / row[1]) * 100}\n"  
                 
-            source_query = '''SELECT source, SUM(amount)
-                              FROM EXPENSE
-                              GROUP BY source
-                            '''
-            cursor2.execute(source_query)   
-            source_rep = cursor2.fetchall()
-            conn2.commit() 
+                source_query = '''SELECT source, SUM(amount)
+                                  FROM EXPENSE
+                                  GROUP BY source
+                                '''
+                cursor2.execute(source_query)   
+                source_rep = cursor2.fetchall()
+                conn2.commit() 
             
-            exp_source_labels = []
-            exp_source_sizes = []
-            for row in source_rep:
-                exp_source_labels.append(row[0])
-                exp_source_sizes.append(row[1])
-                final_ans += f"source : {row[0]} / amount of source : {row[1]} / ratio : %{(row[1] / total_exp) * 100}" 
-                final_ans += f"ratio to fitered amount(filterd_amount/source_amount): %{(total / row[1]) * 100}\n"            
+                exp_source_labels = []
+                exp_source_sizes = []
+                for row in source_rep:
+                    exp_source_labels.append(row[0])
+                    exp_source_sizes.append(row[1])
+                    final_ans += f"Source : {row[0]} / amount of source : {row[1]} / ratio : %{(row[1] / total_exp) * 100}" 
+                    final_ans += f"Ratio to fitered amount(filterd_amount/source_amount): %{(total / row[1]) * 100}\n"            
             
-            conn2.close()
-            #except:
-                #pass
-        self.report_view.setPlainText(final_ans)    
+                conn2.close()
+            except:
+                pass
+        self.report_view.setPlainText(final_ans) 
+           
+        #canvas = FigureCanvas(fig)
+        #self.leftLayout.addWidget(canvas)
         
     def settings(self):
         if self.current_layout == 'settings':
@@ -1501,6 +1520,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.clear_layout(self.hlayout5)
         self.clear_layout(self.hlayout6)
         self.clear_layout(self.hlayout7)
+        self.clear_layout(self.hlayout8)
 
         self.first_name_line_edit2 = Validation.QLineEdit()
         self.first_name_line_edit2.setPlaceholderText("firs name")
@@ -1534,15 +1554,22 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.year_line_edit2 = Validation.QLineEdit()
         self.year_line_edit2.setStyleSheet(self.line_main_style)
         self.year_line_edit2.setPlaceholderText('year')
-
-        self.label_image = Validation.QLabel()
-        self.label_image.setFixedSize(200, 100)
+        
+        self.label_image = Validation.QLabel('No image uploaded', self)
         self.label_image.setScaledContents(True)
-        self.add_image_btn = Validation.QPushButton("Add Image")
-        self.add_image_btn.setStyleSheet(self.btn_main_style)
-        self.leftLayout.addWidget(self.add_image_btn)
-        #self.add_image_btn.clicked.connect(self.upload_image)
+        self.label_image.setFixedSize(200, 100)
+        self.label_image.setStyleSheet("color : blue")
+        self.upload_btn = Validation.QPushButton('Upload Image', self)
+        self.upload_btn.setStyleSheet(self.btn_main_style)
+        self.upload_btn.clicked.connect(self.upload_image)
+
+        self.display_btn = Validation.QPushButton('Display Image', self)
+        self.display_btn.setStyleSheet(self.btn_main_style)
+        self.display_btn.clicked.connect(self.display_image)
+
         self.leftLayout.addWidget(self.label_image)
+        self.leftLayout.addWidget(self.upload_btn)
+        self.leftLayout.addWidget(self.display_btn)
 
         self.leftLayout.addLayout(self.hlayout5)
         self.err_lab_firstname = Validation.QLabel("NAME ERROR")
@@ -1632,12 +1659,6 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.change_info_btn = Validation.QPushButton("Change")
         self.change_info_btn.setStyleSheet(self.btn_main_style)
         self.leftLayout.addWidget(self.change_info_btn)
-
-        self.Dark_mode = Validation.QComboBox()
-        self.Dark_mode.setStyleSheet(self.combo_main_style)
-        self.Dark_mode.addItems(self.dark_mode)
-        self.leftLayout.addWidget(self.Dark_mode)
-        self.Dark_mode.currentTextChanged.connect(self.dark_lite_mode)
         
         self.delete_err = Validation.QLabel("please fill the gap!")
         self.delete_err.setVisible(False)
@@ -1662,10 +1683,56 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.change_info_btn.clicked.connect(self.change_information)
         self.delete_user.clicked.connect(self.Delete_User)
         
+        self.sun_label = Validation.QLabel(self)
+        self.moon_label = Validation.QLabel(self)
+        self.sun_label.setFixedSize(100, 100)
+        self.moon_label.setFixedSize(100, 100)
+        self.sun_label.setScaledContents(True)
+        self.moon_label.setScaledContents(True)
+
+        self.sun_pixmap = Validation.QPixmap('C:/Users/ASUS/ap_project_2th_part/cloud-sun-.png')  
+        self.moon_pixmap = Validation.QPixmap('C:/Users/ASUS/ap_project_2th_part/nite_moon.jpg')  
+        self.sun_label.setPixmap(self.sun_pixmap)
+        self.moon_label.setPixmap(self.moon_pixmap)
+
+        self.sun_label.mousePressEvent = self.switch_to_light_mode
+        self.moon_label.mousePressEvent = self.switch_to_dark_mode
+
+        self.leftLayout.addLayout(self.hlayout8)
+
+        self.hlayout8.addWidget(self.sun_label)
+        self.hlayout8.addWidget(self.moon_label)
+        
+    def upload_image(self):
+        img_db_path = os.path.join(self.curr_dir, 'images.db')
+        self.conn = sql.connect(img_db_path)
+        self.cursor = self.conn.cursor()
+        self.cursor.execute('''CREATE TABLE IF NOT EXISTS images
+                               (id INTEGER PRIMARY KEY, image BLOB)''')
+        self.conn.commit()
+        file_dialog = Validation.QFileDialog()
+        file_path, _ = file_dialog.getOpenFileName(self, 'Open Image', '', 'Images (*.png *.xpm *.jpg *.jpeg *.bmp)')
+
+        if file_path:
+            with open(file_path, 'rb') as file:
+                blob_data = file.read()
+
+            self.cursor.execute('INSERT INTO images (image) VALUES (?)', (blob_data,))
+            self.conn.commit()
+            self.label_image.setText('Image uploaded successfully!')
+
+    def display_image(self):
+        self.cursor.execute('SELECT image FROM images ORDER BY id DESC LIMIT 1')
+        image_data = self.cursor.fetchone()
+
+        if image_data:
+            pixmap = Validation.QPixmap()
+            pixmap.loadFromData(image_data[0])
+            self.label_image.setPixmap(pixmap.scaled(200, 200, Validation.Qt.AspectRatioMode.KeepAspectRatio))       
+        
     def change_information(self):
         first_name = self.first_name_line_edit2.text()
         last_name = self.last_name_line_edit2.text()
-        #user_name = self.user_name_line_edit2.text()
         password = self.password_line_edit2.text()
         re_password = self.repeat_password_line_edit2.text()
         email = self.email_line_edit2.text()
@@ -2054,16 +2121,15 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         conn.close()                                    
                 
     def exit(self):
-        self.close()
+        self.close()  
+    
+    def switch_to_dark_mode(self, event):
+        self.leftWidget.setStyleSheet("background-color: #BBB477;")
+        self.rightWidget.setStyleSheet("background-color: #2E5894;")
 
-    def dark_lite_mode(self, text):
-        if text == "Dark":
-        
-            self.leftWidget.setStyleSheet("background-color: #BBB477;")
-            self.rightWidget.setStyleSheet("background-color: #2E5894;")
-        else  :
-            self.leftWidget.setStyleSheet("background-color: #FBE870;")
-            self.rightWidget.setStyleSheet("background-color: #52afb6;")            
+    def switch_to_light_mode(self, tevent):
+        self.leftWidget.setStyleSheet("background-color: #FBE870;")
+        self.rightWidget.setStyleSheet("background-color: #52afb6;")
                 
     def clear_layout(self, layout):
         while layout.count():
