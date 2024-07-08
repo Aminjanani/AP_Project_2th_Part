@@ -27,6 +27,7 @@ class signup_login(MainUI) :
         user.__init__(self)
         check_validation.__init__(self)
         MainUI.__init__(self)
+        self.db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'users_file.db')
         self.max_error = 0
         self.countdown = 15
         
@@ -555,19 +556,24 @@ class signup_login(MainUI) :
             self.log_sub2_btn.hide()
             
     def find_user_pass(self, user_name, security_answer):
-        conn = sqlite3.connect('usersApp.db')
-        cursor = conn.cursor()
+        try:
+            db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'users_file.db')
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
 
-        cursor.execute('''
-            SELECT password FROM users WHERE user_name = ? AND security_answer = ?
-        ''', (user_name, security_answer))
+            cursor.execute('''
+                SELECT password FROM Users WHERE user_name = ? AND security_answer = ?
+            ''', (user_name, security_answer))
 
-        result = cursor.fetchone()
-        conn.close()
-        if result:
-            return result[0]
-        else:
+            result = cursor.fetchone()
+            return result[0] if result else None
+        except sqlite3.Error as e:
+            print(f"An error occurred: {e}")
             return None
+        finally:
+            if conn:
+                conn.close()
+
         
 
     def show_pass(self) :
@@ -620,10 +626,11 @@ class signup_login(MainUI) :
         
     def create_user_file(self):
         try:
-            conn = sqlite3.connect('usersApp.db')
+            db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'users_file.db')
+            conn = sqlite3.connect(db_path)
             cursor = conn.cursor()
 
-            #create table if not exist user
+            # Create table if not exists
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS Users (
                     first_name TEXT,
@@ -640,18 +647,16 @@ class signup_login(MainUI) :
                 )
             ''')
 
-            user_info = (self.first_name, self.last_name, self.user_name, self.password, self.security_question, self.email,
-                        self.phone_number, self.city, self.birth_year, self.birth_mounth, self.birth_day)
+            user_info = (
+                self.first_name, self.last_name, self.user_name, self.password,
+                self.security_question, self.email, self.phone_number, self.city,
+                self.birth_year, self.birth_month, self.birth_day
+            )
 
-            
             cursor.execute('SELECT * FROM Users WHERE user_name = ?', (self.user_name,))
             existing_user = cursor.fetchone()
-            if existing_user:
-                flag = True
-            else:
-                flag = False
 
-            if not flag:
+            if not existing_user:
                 cursor.execute('''
                     INSERT INTO Users (first_name, last_name, user_name, password, security_answer, email, phone_number, city, birth_year, birth_month, birth_day)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -835,7 +840,8 @@ class signup_login(MainUI) :
                 
     def search_user(self, user_name, password):
         try:
-            conn = sqlite3.connect('usersApp.db')
+            db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'users_file.db')
+            conn = sqlite3.connect(db_path)
             cursor = conn.cursor()
 
             cursor.execute('''
@@ -846,12 +852,12 @@ class signup_login(MainUI) :
 
             result = cursor.fetchone()
             if result:
-                self.first_name, self.last_name, self.user_name, self.password, self.security_question, self.email, self.phone_number, self.city, self.birth_year, self.birth_mounth, self.birth_day = result
-                flag = True
+                (self.first_name, self.last_name, self.user_name, self.password,
+                 self.security_question, self.email, self.phone_number, self.city,
+                 self.birth_year, self.birth_month, self.birth_day) = result
+                return True
             else:
-                flag = False
-
-            return flag
+                return False
         except sqlite3.Error as e:
             print(f"An error occurred: {e}")
             return False
