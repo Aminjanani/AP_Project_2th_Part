@@ -244,7 +244,8 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.close_rev_file_label.setVisible(False)
         self.source_of_revenue_combo_box = Validation.QComboBox()
         self.source_of_revenue_combo_box.setStyleSheet(self.combo_main_style)
-
+        
+        self.create_user_category_database()
         self.add_item_category_combo()
 
         self.description_revenue_line = Validation.QLineEdit()
@@ -317,7 +318,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
 
         self.type_of_revenue_combo_box.addItems(self.default_type_combo)
         self.type_of_revenue_line.textChanged.connect(self.update_type_combo_box)
-        self.source_of_revenue_combo_box.addItems(self.category_combo)
+        #self.source_of_revenue_combo_box.addItems(self.category_combo)
 
         self.type_of_revenue_combo_box.activated[int].connect(self.set_revenue_line)
         
@@ -1971,53 +1972,63 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         conn = sql.connect(cat_db_path)
         cursor = conn.cursor()
         
-        create_table_query = '''CREATE TABLE IF NOT EXISTS CATEGORY (category TEXT,
-                                UNIQUE (category))'''
+        create_table_query = '''CREATE TABLE IF NOT EXISTS CATEGORY 
+                                (
+                                    category TEXT, 
+                                    UNIQUE (category)
+                                )'''
                                 
         cursor.execute(create_table_query) 
         conn.commit()       
         
-        #add_item_query = '''INSERT OR IGNORE INTO CATEGORY (category)
-                            #VALUES (?)'''
+        add_item_query = '''INSERT OR IGNORE INTO CATEGORY (category)
+                            VALUES (?)'''
                             
-        #cursor.executemany(add_item_query, [(category, ) for category in self.category_combo]) 
+        #cursor.execute(add_item_query, [(category, ) for category in self.category_combo]) 
         #conn.commit() 
-        
+        for category in self.category_combo:
+            cursor.execute(add_item_query, (category, ))
+            conn.commit()
+            
         conn.close()                                    
             
         #for category_item in self.category_combo:
             #df[len(df)] = category_item
             
     def add_item_category_combo(self):
-        self.create_user_category_database()
-        
         cat_db_path = os.path.join(self.curr_dir, self.category_file)
+        #if not os.path.exists(cat_db_path):       
+            #self.create_user_category_database()
+        
         conn = sql.connect(cat_db_path)
         cursor = conn.cursor()
         
-        select_query = '''SELECT category FROM CATEGORY'''
+        select_query = '''SELECT * FROM CATEGORY'''
         cursor.execute(select_query) 
         rows = cursor.fetchall()
         conn.commit()
         
         items_category = [row[0] for row in rows]
         self.source_of_revenue_combo_box.addItems(items_category)
-
-    def add_text_to_db(self):  
-        self.create_user_category_database()
         
-        cat_db_path = os.path.join(self.curr_dir, self.category_file)
+        conn.close()
+
+    def add_text_to_db(self):
+        cat_db_path = os.path.join(self.curr_dir, self.category_file)  
+        #if not os.path.exists(cat_db_path):       
+            #self.create_user_category_database()
+        
         conn = sql.connect(cat_db_path)
         cursor = conn.cursor()
         
         text_category_xl = self.add_category_line.text()
-        check_query = '''SELECT *FROM CATEGORY WHERE category = ?'''
+        check_query = '''SELECT category FROM CATEGORY WHERE category = ?'''
         cursor.execute(check_query, (text_category_xl, )) 
         resault = cursor.fetchall()
         conn.commit()
 
-        if not resault[0] is None:
-            pass #self.category_label.show()
+        if not len(resault) == 0:
+            self.category_label.show()
         else:
             if self.category_label.isVisible():
                 self.category_label.hide()

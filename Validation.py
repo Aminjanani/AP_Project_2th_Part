@@ -3,7 +3,7 @@
 
 import base64
 from datetime import datetime
-import re, os, sys, time, pandas as pd, numpy as np
+import re, sys, time, pandas as pd, numpy as np
 from PyQt6 import QtWidgets, uic
 from PyQt6.QtWidgets import (QPushButton, QWidget, QMainWindow, QFileDialog, 
                              QApplication, QLabel, QVBoxLayout, QHBoxLayout, 
