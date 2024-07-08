@@ -873,7 +873,7 @@ class signup_login(MainUI) :
             if self.search_user(user_text, pass_text):
                 self.set_visibility(False)
                 self.login_window.close()
-                self.set_user_info()
+                #self.set_user_info()
                 self.Main_window()
             else :
                 self.check_error()
