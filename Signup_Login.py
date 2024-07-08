@@ -650,7 +650,7 @@ class signup_login(MainUI) :
             user_info = (
                 self.first_name, self.last_name, self.user_name, self.password,
                 self.security_question, self.email, self.phone_number, self.city,
-                self.birth_year, self.birth_month, self.birth_day
+                self.birth_year, self.birth_mounth, self.birth_day
             )
 
             cursor.execute('SELECT * FROM Users WHERE user_name = ?', (self.user_name,))
@@ -854,7 +854,7 @@ class signup_login(MainUI) :
             if result:
                 (self.first_name, self.last_name, self.user_name, self.password,
                  self.security_question, self.email, self.phone_number, self.city,
-                 self.birth_year, self.birth_month, self.birth_day) = result
+                 self.birth_year, self.birth_mounth, self.birth_day) = result
                 return True
             else:
                 return False
@@ -873,6 +873,7 @@ class signup_login(MainUI) :
             if self.search_user(user_text, pass_text):
                 self.set_visibility(False)
                 self.login_window.close()
+                self.set_user_info()
                 self.Main_window()
             else :
                 self.check_error()

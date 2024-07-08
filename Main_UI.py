@@ -46,13 +46,60 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.curr_info = [self.first_name, self.last_name, self.user_name,
                           self.password, self.security_question, self.email, self.phone_number, self.city,
                           self.birth_year, self.birth_mounth, self.birth_day]
-        self.Main_window()
+        #self.Main_window()
 
     def Main_window(self):
         self.setWindowTitle(self.window_title)
         self.setGeometry(400, 100, 600, 300)
         self.mainWidget = Validation.QWidget(self)
         self.mainLayout = Validation.QHBoxLayout(self.mainWidget)
+        
+        rev_db = os.path.join(self.curr_dir, self.revenue_file)
+        rev_conn = sql.connect(rev_db)
+        rev_cur = rev_conn.cursor()
+        rev_create_table_query = '''CREATE TABLE IF NOT EXISTS REVENUE (
+                                    amount INT NOT NULL,
+                                    source TEXT NOT NULL,
+                                    description TEXT,
+                                    type TEXT NOT NULL,
+                                    year INT NOT NULL,
+                                    month TEXT NOT NULL,
+                                    day INT NULL, 
+                                    UNIQUE(amount, source, 
+                                    description, type, year, month, day))'''
+        rev_cur.execute(rev_create_table_query)
+        rev_cur.close() 
+        rev_conn.close()                            
+        
+        exp_db = os.path.join(self.curr_dir, self.expense_file)
+        exp_conn = sql.connect(exp_db)
+        exp_cur = exp_conn.cursor()
+        exp_create_table_query = '''CREATE TABLE IF NOT EXISTS EXPENSE (
+                                    amount INT NOT NULL,
+                                    source TEXT NOT NULL,
+                                    description TEXT,
+                                    type TEXT NOT NULL,
+                                    year INT NOT NULL,
+                                    month TEXT NOT NULL,
+                                    day INT NULL, 
+                                    UNIQUE(amount, source, 
+                                    description, type, year, month, day))'''
+        
+        exp_cur.execute(exp_create_table_query)
+        exp_cur.close() 
+        exp_conn.close()
+        
+        cat_db = os.path.join(self.curr_dir, self.category_file)
+        cat_conn = sql.connect(cat_db)
+        cat_cur = cat_conn.cursor()
+        cat_create_table_query = '''CREATE TABLE IF NOT EXISTS CATEGORY 
+                                (
+                                    category TEXT, 
+                                    UNIQUE (category)
+                                )'''
+        cat_cur.execute(cat_create_table_query)
+        cat_cur.close() 
+        cat_conn.close()                       
 
         self.leftWidget = Validation.QWidget(self)
         self.leftWidget.setStyleSheet("background-color: #FBE870;")
@@ -673,8 +720,6 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.category_label.setStyleSheet("color : red")
         self.category_label_err = Validation.QLabel("please close the file and try again")
         self.category_label_err.setStyleSheet("color : red")
-        #self.category_label_err.setVisible(True)
-
 
         self.leftLayout.addLayout(self.hlayout)
         self.hlayout.addWidget(self.add_category_line)
@@ -684,8 +729,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.category_label.hide()
         self.category_label_err.hide()
 
-        self.add_btn.clicked.connect(self.add_text_to_db)
-        #self.df = pd.DataFrame(columns = ['Category'])        
+        self.add_btn.clicked.connect(self.add_text_to_db)       
             
     def search(self):
         if self.current_layout == 'search':
@@ -1245,8 +1289,8 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
                 if month_report_flag and False in rep_val_list:
                     filter_selected = True
                     query += " OR month = ?"
-                    filters.append(curr_month)       
-            
+                    filters.append(curr_month)      
+                    
                 if year_report_flag and False in rep_val_list:
                     filter_selected = True
                     query += " OR year = ?"
@@ -1844,7 +1888,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
             change_conn = sql.connect(db_path)
             change_cursor = change_conn.cursor()
             
-            create_query = '''CREATE TABLE IF NOT EXISTS USERS (first_name, last_name,
+            create_query = '''CREATE TABLE IF NOT EXISTS Users (first_name, last_name,
                                     user_name TEXT, password TEXT,
                                     security_answer TEXT, email TEXT,
                                     phone_number INT, city TEXT,
@@ -1858,7 +1902,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
             change_cursor.execute(create_query) 
             change_conn.commit()                 
                             
-            insert_query = '''INSERT OR IGNORE INTO USERS (
+            insert_query = '''INSERT OR IGNORE INTO Users (
                                     first_name, last_name,
                                     user_name, password,
                                     security_answer, email,
@@ -1873,7 +1917,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
             change_cursor.execute(insert_query, tuple(self.curr_info)) 
             change_conn.commit()                    
             
-            change_info_query = '''UPDATE USERS
+            change_info_query = '''UPDATE Users
                                     SET first_name = ?, last_name = ?,
                                         user_name = ?, password = ?,
                                         security_answer = ?, email = ?,
@@ -1919,22 +1963,23 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
             exp_db_path = os.path.join(self.curr_dir, self.expense_file)
             cat_db_path = os.path.join(self.curr_dir, self.category_file) 
             user_db_path = os.path.join(self.curr_dir, self.users_file)
-            if delete_text == "user" :
-                if os.path.exists(rev_db_path) :
+            if delete_text == "user":
+                self.close()
+                if os.path.exists(rev_db_path):
                     os.remove(rev_db_path)
                     
-                if os.path.exists(exp_db_path) :
+                if os.path.exists(exp_db_path):
                     os.remove(exp_db_path )   
                     
-                if os.path.exists(cat_db_path) :
+                if os.path.exists(cat_db_path):
                     os.remove(cat_db_path)
                 
-                if os.path.exists(user_db_path) :
+                if os.path.exists(user_db_path):
                     try :
                         conn = sql.connect(user_db_path)
                         cursor = conn.cursor()
                         
-                        delete_query = '''DELETE FROM USERS WHERE 
+                        delete_query = '''DELETE FROM Users WHERE 
                                                 first_name = ? AND last_name = ? AND
                                                 user_name = ? AND password = ? AND
                                                 security_answer = ? AND email = ? AND
@@ -1949,25 +1994,25 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
                     except :
                         pass
                 
-            elif delete_text == "transaction" :
-                if os.path.exists(rev_db_path) :
+            elif delete_text == "transaction":
+                if os.path.exists(rev_db_path):
                     os.remove(rev_db_path)
                     
-                if os.path.exists(exp_db_path) :
+                if os.path.exists(exp_db_path):
                     os.remove(exp_db_path)   
                     
-                if os.path.exists(cat_db_path) :
+                if os.path.exists(cat_db_path):
                     os.remove(cat_db_path)
                         
-            elif delete_text == "just revenue" :
-                if os.path.exists(rev_db_path) :
+            elif delete_text == "just revenue":
+                if os.path.exists(rev_db_path):
                     os.remove(rev_db_path)
                         
-            elif delete_text == "just expense" :
-                if os.path.exists(exp_db_path) :
+            elif delete_text == "just expense":
+                if os.path.exists(exp_db_path):
                     os.remove(exp_db_path)       
-        else :
-            if not self.delete_err.isVisisble() :
+        else:
+            if not self.delete_err.isVisisble():
                 self.delete_err.setVisible(True)         
         
     def create_user_revenue_databse(self): 
@@ -2224,7 +2269,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         if text and self.type_of_expense_combo_box.findText(text) == -1:
             self.type_of_expense_combo_box.addItems(text) 
             
-if __name__ == '__main__' :
-    app = Validation.QApplication(Validation.sys.argv)
-    ex = MainUI()    
-    Validation.sys.exit(app.exec())                                                    
+#if __name__ == '__main__' :
+    #app = Validation.QApplication(Validation.sys.argv)
+    #ex = MainUI()    
+    #Validation.sys.exit(app.exec())                                                    
