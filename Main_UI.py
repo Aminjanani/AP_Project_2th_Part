@@ -46,7 +46,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.curr_info = [self.first_name, self.last_name, self.user_name,
                           self.password, self.security_question, self.email, self.phone_number, self.city,
                           self.birth_year, self.birth_mounth, self.birth_day]
-        self.Main_window()
+        #self.Main_window()
 
     def Main_window(self):
         self.setWindowTitle(self.window_title)
@@ -673,8 +673,6 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.category_label.setStyleSheet("color : red")
         self.category_label_err = Validation.QLabel("please close the file and try again")
         self.category_label_err.setStyleSheet("color : red")
-        #self.category_label_err.setVisible(True)
-
 
         self.leftLayout.addLayout(self.hlayout)
         self.hlayout.addWidget(self.add_category_line)
@@ -684,8 +682,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.category_label.hide()
         self.category_label_err.hide()
 
-        self.add_btn.clicked.connect(self.add_text_to_db)
-        #self.df = pd.DataFrame(columns = ['Category'])        
+        self.add_btn.clicked.connect(self.add_text_to_db)       
             
     def search(self):
         if self.current_layout == 'search':
@@ -1865,10 +1862,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
                                     phone_number, city,
                                     birth_year, birth_month, birth_day)
                               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)      
-                              '''          
-            #curr_info = [self.first_name, self.last_name, self.user_name,
-                         #self.password, self.security_question, self.email, self.phone_number, self.city,
-                         #self.birth_year, self.birth_mounth, self.birth_day]                      
+                              '''                               
                               
             change_cursor.execute(insert_query, tuple(self.curr_info)) 
             change_conn.commit()                    
@@ -2224,7 +2218,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         if text and self.type_of_expense_combo_box.findText(text) == -1:
             self.type_of_expense_combo_box.addItems(text) 
             
-if __name__ == '__main__' :
-    app = Validation.QApplication(Validation.sys.argv)
-    ex = MainUI()    
-    Validation.sys.exit(app.exec())                                                    
+#if __name__ == '__main__' :
+    #app = Validation.QApplication(Validation.sys.argv)
+    #ex = MainUI()    
+    #Validation.sys.exit(app.exec())                                                    
