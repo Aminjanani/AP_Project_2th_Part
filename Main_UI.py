@@ -18,7 +18,7 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
     
     def __init__(self):
         super().__init__()  
-        user.__init__(self)
+        #user.__init__(self)
         Validation.check_validation.__init__(self)
         self.window_title = 'Main Menu'
         self.rev_amount = ""
@@ -36,12 +36,6 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.exp_desc = ""
         self.exp_type = ""
         self.searched_word = ""
-        self.revenue_file = self.user_name + f"_revenue.db"
-        #self.revenue_file = f"amin_revenue.db"
-        self.expense_file = self.user_name + f"_expense.db"
-        #self.expense_file = f"amin_expense.db"
-        self.category_file = self.user_name + f"_category.db"
-        #self.category_file = f"amin_category.db"
         self.curr_dir = os.path.dirname(os.path.abspath(__file__))
         self.curr_info = [self.first_name, self.last_name, self.user_name,
                           self.password, self.security_question, self.email, self.phone_number, self.city,
@@ -49,6 +43,10 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         #self.Main_window()
 
     def Main_window(self):
+        self.revenue_file = self.user_name + f"_revenue.db"
+        self.expense_file = self.user_name + f"_expense.db"
+        self.category_file = self.user_name + f"_category.db"
+        
         self.setWindowTitle(self.window_title)
         self.setGeometry(400, 100, 600, 300)
         self.mainWidget = Validation.QWidget(self)

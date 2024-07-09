@@ -16,7 +16,7 @@ from Validation import check_validation
 
 
 # ***********  START SIGNUP_LOGIN CLASS   ************
-class signup_login(MainUI) :
+class signup_login(MainUI):
     
     mounths = {"January": '31', "February": '29', "March": '31',
                "April": '30', "May": '31', "June": '30',
@@ -24,13 +24,12 @@ class signup_login(MainUI) :
                "October": '31', "November": '30', "December": '31'}
     
     def __init__(self):
-        user.__init__(self)
+        #user.__init__(self)
         check_validation.__init__(self)
         MainUI.__init__(self)
         self.db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'users_file.db')
         self.max_error = 0
         self.countdown = 15
-        
     
     # ***********  START SIGN UP WINDOW   ************
 
@@ -291,7 +290,6 @@ class signup_login(MainUI) :
         self.login_window.setGeometry(300, 100, 500, 400)
         self.login_window.setStyleSheet("background-color: #33CC99")
         
-        
         self.timer_label = QLabel("remaining time : 00:15", self.login_window)
         self.timer_label.setVisible(False)
         self.timer_label.setStyleSheet('color: red')
@@ -499,7 +497,7 @@ class signup_login(MainUI) :
         
     #***********  END LOGIN WINDOW   ************
 
-    def start_timer(self) :
+    def start_timer(self):
         self.end_time = QDateTime.currentDateTime().addSecs(self.countdown)  
         self.timer = QTimer(self.login_window)
         self.timer.timeout.connect(self.update_time)
@@ -573,11 +571,9 @@ class signup_login(MainUI) :
         finally:
             if conn:
                 conn.close()
-
-        
-
-    def show_pass(self) :
-        if not self.show_password.isVisible() :
+                
+    def show_pass(self):
+        if not self.show_password.isVisible():
             self.show_password.setVisible(True)
         log_text = self.log_user2_line_edit.text() 
         pass_text = self.log_password2_line_edit.text()  
@@ -587,29 +583,29 @@ class signup_login(MainUI) :
         else :
             self.show_password.setText(f"password does not exist")       
             
-    def update_combo_box(self, text) :
+    def update_combo_box(self, text):
         self.city_combo_box.clear()
-        for word in self.default_cities :
-            if text.lower() in word.lower() :
+        for word in self.default_cities:
+            if text.lower() in word.lower():
                 self.city_combo_box.addItem(word) 
                 
-    def set_city_line_edit(self, index) :
+    def set_city_line_edit(self, index):
         text = self.city_combo_box.itemText(index)
         self.city_line_edit.setText(text) 
 
-    def set_year_line_edit(self, index) :
+    def set_year_line_edit(self, index):
         text = self.year_combo_box.itemText(index)
         self.year_line_edit.setText(text)
 
-    def set_mounth_line_edit(self, index) :
+    def set_mounth_line_edit(self, index):
         text = self.mounth_combo_box.itemText(index)
         self.mounth_line_edit.setText(text)
 
-    def set_day_line_edit(self, index) :
+    def set_day_line_edit(self, index):
         text = self.day_combo_box.itemText(index)
         self.day_line_edit.setText(text)                 
       
-    def open_login_window(self) :
+    def open_login_window(self):
         self.signup_window.close()
         self.login_window = QMainWindow() 
         self.central_widget = QWidget()
@@ -688,7 +684,7 @@ class signup_login(MainUI) :
         self.birth_mounth = self.mounth_line_edit.text()
         self.birth_year = self.year_line_edit.text()
 
-    def close_signup_open_login(self) :
+    def close_signup_open_login(self):
         self.set_user_info()
         
         first_name_val = self.name_val(self.first_name)  
@@ -708,131 +704,131 @@ class signup_login(MainUI) :
         val_list = [first_name_val, last_name_val, password_val, repeat_password_val,
                     passwords_eq, email_val, phone_number_val, year_val, mounth_val, day_val, security_val]
         
-        if False in val_list :
-            if not val_list[0] :
-                if self.first_name == "" :
+        if False in val_list:
+            if not val_list[0]:
+                if self.first_name == "":
                     self.first_name_label.setText("please fill the gap")
                 if not self.first_name_label.isVisible() :    
                     self.first_name_label.setVisible(True)
-            else :
+            else:
                 self.first_name_label.setVisible(False)
                 self.first_name_label.setText("first_name is not valid!")
                 
-            if not val_list[1] :
-                if self.last_name == "" :
+            if not val_list[1]:
+                if self.last_name == "":
                     self.last_name_label.setText("please fill the gap")
-                elif self.last_name != "" :
+                elif self.last_name != "":
                     self.last_name_label.setText("last_name is not valid!")   
-                if not self.last_name_label.isVisible() :     
+                if not self.last_name_label.isVisible():     
                     self.last_name_label.setVisible(True)
-            else :
+            else:
                 self.last_name_label.setText("last_name is not valid!")
                 self.last_name_label.setVisible(False)   
                 
             
-            if not val_list[2] :
-                if self.password == "" :
+            if not val_list[2]:
+                if self.password == "":
                     self.password_label.setText("please fill the gap")
-                elif self.password != "" :
+                elif self.password != "":
                     self.password_label.setText("password is not valid!")    
-                if not self.password_label.isVisible() :
+                if not self.password_label.isVisible():
                     self.password_label.setVisible(True)
             else : 
                 self.password_label.setVisible(False)       
                 self.password_label.setText("password is not valid!")
             
                     
-            if not val_list[3] :
-                if self.repeat_password == "" :
+            if not val_list[3]:
+                if self.repeat_password == "":
                     self.repeat_password_label.setText("please fill the gap")
                     
-                elif self.repeat_password != "" :
+                elif self.repeat_password != "":
                     self.repeat_password_label.setText("repeated_password is not valid!")
                     #self.repeat_password_label.setVisible(True)    
-                    if self.password != "" and self.repeat_password != self.password :
+                    if self.password != "" and self.repeat_password != self.password:
                         self.repeat_password_label.setText("not match!") 
-                    elif self.password == "" :
+                    elif self.password == "":
                         self.repeat_password_label.setText("not match!")  
                     self.repeat_password_label.setVisible(True)              
-                if not self.repeat_password_label.isVisible() :
+                if not self.repeat_password_label.isVisible():
                     self.repeat_password_label.setVisible(True)
-            elif val_list[3] and self.repeat_password != self.password :
+            elif val_list[3] and self.repeat_password != self.password:
                         self.repeat_password_label.setText("not match!")    
-                        if not self.repeat_password_label.isVisible() :
+                        if not self.repeat_password_label.isVisible():
                             self.repeat_password_label.setVisible(True)    
-            else :
+            else:
                 self.repeat_password_label.setVisible(False)
                 self.repeat_password_label.setText("repeated_password is not valid!") 
             
-            if not val_list[5] :
-                if self.email == "" :
+            if not val_list[5]:
+                if self.email == "":
                     self.email_label.setText("please fill the gap")
-                elif self.email != "" :
+                elif self.email != "":
                     self.email_label.setText("email address is not valid!")    
-                if not self.email_label.isVisible() :
+                if not self.email_label.isVisible():
                     self.email_label.setVisible(True)    
-            else :
+            else:
                 self.email_label.setVisible(False)
                 self.email_label.setText("email address is not valid!")    
                 
-            if not val_list[6] :
-                if self.phone_number == "" :
+            if not val_list[6]:
+                if self.phone_number == "":
                     self.phone_number_label.setText("please fill the gap")
-                elif self.phone_number != "" :
+                elif self.phone_number != "":
                     self.phone_number_label.setText("phone_number is not valid!")     
-                if not self.phone_number_label.isVisible() :
+                if not self.phone_number_label.isVisible():
                     self.phone_number_label.setVisible(True)    
-            else :
+            else:
                 self.phone_number_label.setVisible(False)
                 self.phone_number_label.setText("phone_number is not valid!") 
                 
-            if not val_list[7] :
-                if self.birth_year == "" :
+            if not val_list[7]:
+                if self.birth_year == "":
                     self.year_label.setText("please fill the gap")
-                elif self.birth_year != "" :
+                elif self.birth_year != "":
                     self.year_label.setText("birth_year is not valid!")     
-                if not self.year_label.isVisible() :
+                if not self.year_label.isVisible():
                     self.year_label.setVisible(True)    
-            else :
+            else:
                 self.year_label.setVisible(False)
                 self.year_label.setText("birth_year is not valid!")
                 
-            if not val_list[8] :
-                if self.birth_mounth == "" :
+            if not val_list[8]:
+                if self.birth_mounth == "":
                     self.mounth_label.setText("please fill the gap")
-                elif self.birth_mounth != "" :
+                elif self.birth_mounth != "":
                     self.mounth_label.setText("birth_mounth is not valid!")     
-                if not self.mounth_label.isVisible() :
+                if not self.mounth_label.isVisible():
                     self.mounth_label.setVisible(True)    
-            else :
+            else:
                 self.mounth_label.setVisible(False)
                 self.mounth_label.setText("birth_mounth is not valid!")
                 
-            if not val_list[9] :
-                if self.birth_day == "" :
+            if not val_list[9]:
+                if self.birth_day == "":
                     self.day_label.setText("please fill the gap")
-                elif self.birth_day != "" :
+                elif self.birth_day != "":
                     self.day_label.setText("birth_day is not valid!")     
-                if not self.day_label.isVisible() :
+                if not self.day_label.isVisible():
                     self.day_label.setVisible(True)    
-            else :
+            else:
                 self.day_label.setVisible(False)
                 self.day_label.setText("birth_day is not valid!")  
                 
             if not val_list[10]:
                 if not self.security_question_label.isVisible():
                     self.security_question_label.setVisible(True)
-            else :
+            else:
                 if self.security_question_label.isVisible():
                     self.security_question_label.setVisible(False)                 
                 
-            if self.city == "" :
+            if self.city == "":
                 if not self.city_label.isVisible():
                     self.city_label.setVisible(True) 
-            else :
+            else:
                 if self.city_label.isVisible():
                     self.city_label.setVisible(False)                
-        else :
+        else:
             self.create_user_file()
             if not self.close_excel_file_label.isVisible():
                 self.signup_window.close()
@@ -865,15 +861,20 @@ class signup_login(MainUI) :
             if conn:
                 conn.close()
             
-                
-    def check_login_inputs_val(self) :
+    def check_login_inputs_val(self):
         user_text = self.log_user_line_edit.text()
         pass_text = self.log_password_line_edit.text()
         if user_text and pass_text :
             if self.search_user(user_text, pass_text):
                 self.set_visibility(False)
                 self.login_window.close()
-                self.set_user_info()
+                #self.set_user_info()
+                
+                info = [self.first_name, self.last_name, self.user_name, self.password,
+                        self.security_question, self.email, self.phone_number, self.city,
+                        self.birth_year, self.birth_mounth, self.birth_day]
+                
+                self.set_user_attr(info)
                 self.Main_window()
             else :
                 self.check_error()
@@ -884,18 +885,17 @@ class signup_login(MainUI) :
         self.login_label.setVisible(isvisible)
         self.log_password_label.setVisible(isvisible) 
         
-    def check_error(self) :
-        if self.max_error < 2 :
+    def check_error(self):
+        if self.max_error < 2:
             self.max_error += 1
             if not self.login_label.isVisible():
                 self.set_visibility(True)
-        elif self.max_error == 2 :
+        elif self.max_error == 2:
             if self.login_label.isVisible():
                 self.set_visibility(False)
             self.start_timer()
 
-    def new_sign_up(self) :
+    def new_sign_up(self):
         self.sign_up_window() 
 
 # ***********  END SIGNUP_LOGIN CLASS   ************ 
-           
