@@ -18,7 +18,7 @@ class welcome(signup_login):
     def __init__(self) :
         super().__init__()           
         signup_login.__init__(self)
-        self.welcome_page()
+        #self.welcome_page()
 
     def welcome_page(self):
        self.window = QMainWindow()

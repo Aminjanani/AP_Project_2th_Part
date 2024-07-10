@@ -67,9 +67,9 @@ class signup_login(MainUI):
         self.year_line_edit = QLineEdit(self.signup_window)
         self.year_line_edit.setPlaceholderText('year')
         
-        self.close_excel_file_label = QLabel("please close the user's_file first!", self.signup_window)
-        self.close_excel_file_label.setVisible(False)
-        self.close_excel_file_label.setStyleSheet('color: red')
+        self.close_user_db_label = QLabel("please close the user's_file first!", self.signup_window)
+        self.close_user_db_label.setVisible(False)
+        self.close_user_db_label.setStyleSheet('color: red')
         self.first_name_label = QLabel("first_name is not valid!", self.signup_window)
         self.first_name_label.setVisible(False)
         self.first_name_label.setStyleSheet('color: red')
@@ -214,7 +214,7 @@ class signup_login(MainUI):
         self.hlayout2.addWidget(self.mounth_combo_box)
         self.hlayout2.addWidget(self.day_combo_box)
         
-        self.layout.addWidget(self.close_excel_file_label)
+        self.layout.addWidget(self.close_user_db_label)
         self.layout.addWidget(self.first_name_label)
         self.layout.addWidget(self.first_name_line_edit)
         self.layout.addWidget(self.last_name_label)
@@ -578,7 +578,7 @@ class signup_login(MainUI):
         log_text = self.log_user2_line_edit.text() 
         pass_text = self.log_password2_line_edit.text()  
         resault = self.find_user_pass(log_text, pass_text)     
-        if resault is not None :
+        if resault is not None:
             self.show_password.setText(f"{resault}")
         else :
             self.show_password.setText(f"password does not exist")       
@@ -659,12 +659,12 @@ class signup_login(MainUI):
                 ''', user_info)
                 conn.commit()
 
-                if self.close_excel_file_label.isVisible():
-                    self.close_excel_file_label.setVisible(False)
+                if self.close_user_db_label.isVisible():
+                    self.close_user_db_label.setVisible(False)
         except sqlite3.Error as e:
             print(f"An error occurred: {e}")
-            if not self.close_excel_file_label.isVisible():
-                self.close_excel_file_label.setVisible(True)
+            if not self.close_user_db_label.isVisible():
+                self.close_user_db_label.setVisible(True)
         finally:
             if conn:
                 conn.close()
@@ -830,7 +830,7 @@ class signup_login(MainUI):
                     self.city_label.setVisible(False)                
         else:
             self.create_user_file()
-            if not self.close_excel_file_label.isVisible():
+            if not self.close_user_db_label.isVisible():
                 self.signup_window.close()
                 self.Login_window()
                 
@@ -864,17 +864,16 @@ class signup_login(MainUI):
     def check_login_inputs_val(self):
         user_text = self.log_user_line_edit.text()
         pass_text = self.log_password_line_edit.text()
-        if user_text and pass_text :
+        if user_text and pass_text:
             if self.search_user(user_text, pass_text):
                 self.set_visibility(False)
                 self.login_window.close()
-                #self.set_user_info()
                 
-                info = [self.first_name, self.last_name, self.user_name, self.password,
+                user_info = [self.first_name, self.last_name, self.user_name, self.password,
                         self.security_question, self.email, self.phone_number, self.city,
                         self.birth_year, self.birth_mounth, self.birth_day]
                 
-                self.set_user_attr(info)
+                self.set_user_attr(user_info)
                 self.Main_window()
             else :
                 self.check_error()
