@@ -47,6 +47,10 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         self.expense_file = self.user_name + f"_expense.db"
         self.category_file = self.user_name + f"_category.db"
         
+        img_db_path = os.path.join(self.curr_dir, 'images.db')
+        self.conn = sql.connect(img_db_path)
+        self.cursor = self.conn.cursor()
+        
         self.setWindowTitle(self.window_title)
         self.setGeometry(400, 100, 600, 300)
         self.mainWidget = Validation.QWidget(self)
@@ -1747,8 +1751,8 @@ class MainUI(Validation.QMainWindow, user, Validation.check_validation):
         
     def upload_image(self):
         img_db_path = os.path.join(self.curr_dir, 'images.db')
-        self.conn = sql.connect(img_db_path)
-        self.cursor = self.conn.cursor()
+        #self.conn = sql.connect(img_db_path)
+        #self.cursor = self.conn.cursor()
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS images
                                (id INTEGER PRIMARY KEY, image BLOB)''')
         self.conn.commit()

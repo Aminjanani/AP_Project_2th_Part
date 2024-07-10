@@ -27,4 +27,3 @@ class user:
         self.birth_year = user_info[8]
         self.birth_mounth = user_info[9]
         self.birth_day = user_info[10]
-        
